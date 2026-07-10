@@ -87,7 +87,17 @@ async function askAI(text){
   HISTORY.push({role:'assistant', content:raw});
   return raw;
 }
+let CURIOSO_SENT = false;
+let LEAD_SENT = false;
+function registrarCurioso(tema){
+  if(CURIOSO_SENT || LEAD_SENT) return;
+  CURIOSO_SENT = true;
+  sbInsertLead({ owner:'Visitante', pet:'—', species:'', phone:'', motivo:'Preguntó: '+(tema||'información general'), horario:'', urgente:false, tipo:'curioso' }).catch(()=>{});
+}
 function processAIReply(raw){
+  const mc = raw.match(/\[CURIOSO\](\{[\s\S]*?\})/);
+  if(mc){ try{ registrarCurioso(JSON.parse(mc[1]).tema); }catch(e){ registrarCurioso(''); } }
+  raw = raw.replace(/\[CURIOSO\]\{[\s\S]*?\}/,'').trim();
   const m = raw.match(/\[LEAD\](\{[\s\S]*?\})/);
   let visible = raw.replace(/\[LEAD\]\{[\s\S]*?\}/,'').trim();
   if(m){
@@ -95,6 +105,7 @@ function processAIReply(raw){
       const c = JSON.parse(m[1]);
       const lead = { owner:c.owner||'—', pet:(c.pet||'—')+' · '+(c.species||'mascota'), species:c.species||'', phone:c.phone||'',
         motivo:c.motivo||'Consulta', horario:c.horario||'', urgente:!!c.urgente, ts:Date.now() };
+      LEAD_SENT = true;
       sbInsertLead(lead).then(()=>toast('✅ Lead capturado — ya está en el panel'))
         .catch(()=>{ dpSaveUserLead(lead); toast('✅ Lead capturado (local)'); });
     }catch(e){}
@@ -104,6 +115,7 @@ function processAIReply(raw){
 
 // ================= Respaldo local (si la API no responde) =================
 const S = { step:'start', motivo:null, urgente:false, pet:null, species:null, owner:null, phone:null, horario:null };
+let ASKED_INFO = null;
 const KW = {
   urgencia:['no come','no ha comido','vomit','vómit','sangr','decaid','decaíd','urgen','malit','enferm','herid','no se mueve','diarrea','respira','convuls','envenen','intoxic','triste','débil','debil','quieto','frío','frio'],
   cita:['cita','consulta','agendar','apartar','revis','vacun','desparasit','esteriliz','chequeo','valoraci'],
@@ -133,12 +145,12 @@ async function route(text){
     await botSay('Lamento que su compañerito no se sienta bien 🐾 Con gusto le ayudamos — atendemos domésticos y también especies exóticas.'+(S.species?' '+urgentAdvice(S.species):''));
     await botSay('¿Cómo se llama su mascota?'); return; }
   if(detect(text,KW.cita)){ S.motivo=text; S.step='ask_pet'; await botSay('¡Con gusto! 📅 ¿Cómo se llama su mascota?'); return; }
-  if(detect(text,KW.precio)){ await botSay('Le comparto precios de referencia:<br>• Consulta general: $350<br>• Consulta exóticos: $450<br>• Vacunación: desde $280<br>• Estética: desde $250<br>El doctor confirma el total en la revisión 🙂');
+  if(detect(text,KW.precio)){ ASKED_INFO='precios'; await botSay('Le comparto precios de referencia:<br>• Consulta general: $350<br>• Consulta exóticos: $450<br>• Vacunación: desde $280<br>• Estética: desde $250<br>El doctor confirma el total en la revisión 🙂');
     await botSay('¿Le agendo una valoración?'); return; }
-  if(detect(text,KW.horario)){ await botSay('Nuestro horario:<br>• Lun a Vie: 9:00 AM – 7:00 PM<br>• Sábado: 9:00 AM – 2:00 PM<br>• Domingo cerrado — pero este chat le atiende 24/7 😉'); return; }
+  if(detect(text,KW.horario)){ ASKED_INFO='horarios'; await botSay('Nuestro horario:<br>• Lun a Vie: 9:00 AM – 7:00 PM<br>• Sábado: 9:00 AM – 2:00 PM<br>• Domingo cerrado — pero este chat le atiende 24/7 😉'); return; }
   if(sp && detect(text,['atienden','ven ','reciben','tratan','especialista'])){ await botSay('¡Sí! En DOGTOR PETS atendemos '+sp.toLowerCase()+'s y otras especies exóticas 🐾 ¿Le agendo una revisión?'); return; }
   if(detect(text,KW.saludo)){ await botSay('¡Buen día! Le saluda Aura, asistente de DOGTOR PETS 🐾 ¿En qué puedo apoyarle?'); return; }
-  if(detect(text,KW.gracias)){ await botSay('¡Con mucho gusto! Aquí estoy a cualquier hora si algo se le ofrece 🐾'); return; }
+  if(detect(text,KW.gracias)){ if(ASKED_INFO) registrarCurioso(ASKED_INFO); await botSay('¡Con mucho gusto! Aquí estoy a cualquier hora si algo se le ofrece 🐾'); return; }
   await botSay('Le leo 🙂 Puedo apoyarle con <b>urgencias</b>, <b>citas</b>, <b>precios</b> y <b>horarios</b>. ¿Qué necesita?');
 }
 async function askSpecies(){ S.step='ask_species'; await botSay('¿Qué especie es '+escapeHtml(S.pet)+'? (perro, gato, hurón, ave, reptil…)'); }
@@ -147,6 +159,7 @@ async function askPhone(){ S.step='ask_phone'; await botSay('Gracias 🙌 ¿Me c
 async function askHorario(){ S.step='ask_horario'; await botSay('Perfecto. ¿Qué día y hora le acomodan'+(S.urgente?' ? Siendo urgencia, le recomiendo lo más pronto posible':'')+'? La clínica le confirma por este medio.'); }
 async function saveLead(){
   const lead = { owner:S.owner, pet:(S.pet||'—')+' · '+(S.species||'mascota'), species:S.species||'', phone:S.phone||'', motivo:S.motivo||'Consulta', horario:S.horario, urgente:S.urgente, ts:Date.now() };
+  LEAD_SENT = true;
   sbInsertLead(lead).catch(()=>dpSaveUserLead(lead));
   await botSay('¡Listo! ✅ Registré su solicitud: <b>'+escapeHtml(S.pet)+'</b> ('+escapeHtml(S.species||'mascota')+') · preferencia: '+escapeHtml(S.horario)+'. La clínica le confirma por este medio en breve 🐾');
   toast('✅ Lead capturado — véalo en el panel');

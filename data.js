@@ -40,7 +40,7 @@ async function sbInsertLead(l){
   const r = await fetch(SB_URL + "/rest/v1/dogtor_leads", {
     method: "POST",
     headers: { ...SB_H, "Prefer": "return=minimal" },
-    body: JSON.stringify({ owner:l.owner, pet:l.pet, species:l.species||null, horario:l.horario||null, motivo:l.motivo||null, urgente:!!l.urgente, phone:l.phone||null, estado:"nuevo" })
+    body: JSON.stringify({ owner:l.owner, pet:l.pet, species:l.species||null, horario:l.horario||null, motivo:l.motivo||null, urgente:!!l.urgente, phone:l.phone||null, estado:"nuevo", tipo:l.tipo||"lead" })
   });
   if(!r.ok) throw new Error("supabase " + r.status);
 }

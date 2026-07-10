@@ -140,12 +140,12 @@ function fmtWhen(ts){
 }
 
 function allLeads(){
-  const vivos = LIVE.map(l=>({ src:'sb', id:l.id, emoji:'💬', who:l.owner||'—', phone:l.phone||'', pet:l.pet||'—',
+  const vivos = LIVE.map(l=>({ src:'sb', id:l.id, emoji:(l.tipo==='curioso'?'👀':'💬'), who:l.owner||'—', phone:l.phone||'', pet:l.pet||'—',
     what:(l.motivo||'Consulta')+(l.horario?(' — prefiere: '+l.horario):''),
-    when:fmtWhen(l.created_at||Date.now()), urgente:!!l.urgente, estado:l.estado||'nuevo' }));
+    when:fmtWhen(l.created_at||Date.now()), urgente:!!l.urgente, estado:l.estado||'nuevo', tipo:l.tipo||'lead' }));
   const locales = dpGetUserLeads().slice().reverse().map((l,i)=>({ src:'ls', id:'ls'+i, emoji:'💬', who:l.owner, phone:l.phone||'', pet:l.pet,
     what:(l.motivo||'Consulta')+(l.horario?(' — prefiere: '+l.horario):''),
-    when:'ahora mismo · capturado por Aura', urgente:!!l.urgente, estado:'nuevo' }));
+    when:'ahora mismo · capturado por Aura', urgente:!!l.urgente, estado:'nuevo', tipo:'lead' }));
   const demo = DP.leads.map(l=>({ src:'demo', id:l.id, emoji:l.emoji, who:l.who, phone:l.phone, pet:l.pet,
     what:l.what, when:l.when, urgente:l.cls==='b-hot', estado: LOCAL_ESTADOS[l.id] || l.estado, tipo:l.tipo||'lead' }));
   return vivos.concat(locales).concat(demo);
