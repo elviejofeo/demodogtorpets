@@ -93,7 +93,7 @@ function processAIReply(raw){
   if(m){
     try{
       const c = JSON.parse(m[1]);
-      const lead = { owner:c.owner||'—', pet:(c.pet||'—')+' · '+(c.species||'mascota'), species:c.species||'',
+      const lead = { owner:c.owner||'—', pet:(c.pet||'—')+' · '+(c.species||'mascota'), species:c.species||'', phone:c.phone||'',
         motivo:c.motivo||'Consulta', horario:c.horario||'', urgente:!!c.urgente, ts:Date.now() };
       sbInsertLead(lead).then(()=>toast('✅ Lead capturado — ya está en el panel'))
         .catch(()=>{ dpSaveUserLead(lead); toast('✅ Lead capturado (local)'); });
@@ -103,7 +103,7 @@ function processAIReply(raw){
 }
 
 // ================= Respaldo local (si la API no responde) =================
-const S = { step:'start', motivo:null, urgente:false, pet:null, species:null, owner:null, horario:null };
+const S = { step:'start', motivo:null, urgente:false, pet:null, species:null, owner:null, phone:null, horario:null };
 const KW = {
   urgencia:['no come','no ha comido','vomit','vómit','sangr','decaid','decaíd','urgen','malit','enferm','herid','no se mueve','diarrea','respira','convuls','envenen','intoxic','triste','débil','debil','quieto','frío','frio'],
   cita:['cita','consulta','agendar','apartar','revis','vacun','desparasit','esteriliz','chequeo','valoraci'],
@@ -126,7 +126,8 @@ async function route(text){
   const sp = detectSpecies(text); if(sp && !S.species) S.species = sp;
   if(S.step==='ask_pet'){ S.pet=text.replace(/^se llama /i,'').trim(); return S.species?askOwner():askSpecies(); }
   if(S.step==='ask_species'){ S.species=sp||text.trim(); return askOwner(); }
-  if(S.step==='ask_owner'){ S.owner=text.trim(); return askHorario(); }
+  if(S.step==='ask_owner'){ S.owner=text.trim(); return askPhone(); }
+  if(S.step==='ask_phone'){ S.phone=text.trim(); return askHorario(); }
   if(S.step==='ask_horario'){ S.horario=text.trim(); return saveLead(); }
   if(detect(text,KW.urgencia)){ S.urgente=true; S.motivo=text; S.step='ask_pet';
     await botSay('Lamento que su compañerito no se sienta bien 🐾 Con gusto le ayudamos — atendemos domésticos y también especies exóticas.'+(S.species?' '+urgentAdvice(S.species):''));
@@ -142,13 +143,14 @@ async function route(text){
 }
 async function askSpecies(){ S.step='ask_species'; await botSay('¿Qué especie es '+escapeHtml(S.pet)+'? (perro, gato, hurón, ave, reptil…)'); }
 async function askOwner(){ S.step='ask_owner'; if(S.urgente&&S.species) await botSay(urgentAdvice(S.species)); await botSay('¿A nombre de quién registro la solicitud?'); }
-async function askHorario(){ S.step='ask_horario'; await botSay('Gracias 🙌 ¿Qué día y hora le acomodan'+(S.urgente?' ? Siendo urgencia, le recomiendo lo más pronto posible':'')+'? La clínica le confirma por este medio.'); }
+async function askPhone(){ S.step='ask_phone'; await botSay('Gracias 🙌 ¿Me comparte un número de WhatsApp para que la clínica le confirme?'); }
+async function askHorario(){ S.step='ask_horario'; await botSay('Perfecto. ¿Qué día y hora le acomodan'+(S.urgente?' ? Siendo urgencia, le recomiendo lo más pronto posible':'')+'? La clínica le confirma por este medio.'); }
 async function saveLead(){
-  const lead = { owner:S.owner, pet:(S.pet||'—')+' · '+(S.species||'mascota'), species:S.species||'', motivo:S.motivo||'Consulta', horario:S.horario, urgente:S.urgente, ts:Date.now() };
+  const lead = { owner:S.owner, pet:(S.pet||'—')+' · '+(S.species||'mascota'), species:S.species||'', phone:S.phone||'', motivo:S.motivo||'Consulta', horario:S.horario, urgente:S.urgente, ts:Date.now() };
   sbInsertLead(lead).catch(()=>dpSaveUserLead(lead));
   await botSay('¡Listo! ✅ Registré su solicitud: <b>'+escapeHtml(S.pet)+'</b> ('+escapeHtml(S.species||'mascota')+') · preferencia: '+escapeHtml(S.horario)+'. La clínica le confirma por este medio en breve 🐾');
   toast('✅ Lead capturado — véalo en el panel');
-  S.step='start'; S.motivo=null; S.urgente=false; S.pet=null; S.species=null; S.owner=null; S.horario=null;
+  S.step='start'; S.motivo=null; S.urgente=false; S.pet=null; S.species=null; S.owner=null; S.phone=null; S.horario=null;
 }
 
 // ================= Entrada =================

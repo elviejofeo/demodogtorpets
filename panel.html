@@ -7,6 +7,28 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Karla:wght@400;500;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="styles.css">
+<style>
+  .filters{display:flex;gap:7px;flex-wrap:wrap;margin:6px 0 14px}
+  .fchip{border:1px solid var(--line);background:#fff;border-radius:99px;padding:7px 13px;font-size:12.5px;font-weight:700;color:var(--muted);cursor:pointer;font-family:'Karla'}
+  .fchip.active{background:var(--ink);border-color:var(--ink);color:#fff}
+  .brow{margin-bottom:9px}
+  .brow .bl{display:flex;justify-content:space-between;font-size:12.5px;margin-bottom:4px}
+  .brow .bl b{color:var(--ink)}
+  .brow .bt{height:9px;border-radius:99px;background:#EFEDE8;overflow:hidden}
+  .brow .bt i{display:block;height:100%;border-radius:99px}
+  .hourchart{display:flex;align-items:flex-end;gap:3px;height:64px;margin-top:10px}
+  .hourchart .hb{flex:1;background:var(--blue);border-radius:3px 3px 0 0;opacity:.85}
+  .hourchart .hb.off{background:var(--red)}
+  .hourlbl{display:flex;justify-content:space-between;font-size:10.5px;color:var(--muted);margin-top:4px}
+  .legend{display:flex;gap:14px;font-size:11.5px;color:var(--muted);margin-top:8px}
+  .legend i{display:inline-block;width:9px;height:9px;border-radius:2px;margin-right:5px;vertical-align:middle}
+  .acts{display:flex;gap:7px;margin-top:10px;flex-wrap:wrap}
+  .acts .send{margin-top:0;flex:1;min-width:110px}
+  @keyframes flashin{0%{box-shadow:0 0 0 3px var(--ok);transform:scale(1.015)}100%{box-shadow:none;transform:none}}
+  .flash{animation:flashin 1.6s ease-out}
+  .cpiece{position:fixed;top:-14px;width:9px;height:14px;z-index:98;pointer-events:none;animation:cfall linear forwards}
+  @keyframes cfall{to{transform:translateY(105vh) rotate(720deg)}}
+</style>
 </head>
 <body>
 <div class="topbar">
@@ -23,21 +45,37 @@
 <div class="wrap">
   <div class="kicker">Hoy · miércoles 8 de julio</div>
   <h2>Cada mensaje atendido. Cada cliente capturado. Nada perdido.</h2>
-  <p class="sub">El asistente responde 24/7 y deja aquí a cada contacto con sus datos, su mascota y lo que necesita. Tu expediente y tu agenda siguen en tu sistema de siempre — esto te lleva los clientes.</p>
 
-  <div class="stats">
+  <div class="stats" style="margin-top:12px">
     <div class="stat"><div class="n">23</div><div class="l">mensajes atendidos hoy</div></div>
     <div class="stat alert"><div class="n">9</div><div class="l">fuera de horario — antes se perdían</div></div>
-    <div class="stat"><div class="n" id="st-leads">5</div><div class="l">leads capturados con datos completos</div></div>
-    <div class="stat"><div class="n">1</div><div class="l">urgencia detectada y priorizada</div></div>
+    <div class="stat"><div class="n" id="st-leads">0</div><div class="l">leads capturados con datos completos</div></div>
+    <div class="stat"><div class="n" id="st-urg">0</div><div class="l">urgencias detectadas y priorizadas</div></div>
   </div>
 
   <div class="money">
-    <div class="n">9 de cada 10</div>
-    <div class="l">mensajes fuera de horario hoy habrían quedado sin respuesta. Un solo cliente de exóticos capturado vale años de consultas, vacunas y alimento.</div>
+    <div class="n">$<span id="money">0</span> MXN</div>
+    <div class="l">valor estimado capturado hoy en consultas solicitadas — sin contar lo que vale cada cliente nuevo a lo largo de los años (vacunas, alimento, revisiones).</div>
+  </div>
+
+  <div class="rcard">
+    <div class="list-title" style="margin:2px 0 10px">De qué hablan sus clientes</div>
+    <div class="brow"><div class="bl"><span>🚨 Urgencias y síntomas</span><b>34%</b></div><div class="bt"><i style="width:34%;background:var(--red)"></i></div></div>
+    <div class="brow"><div class="bl"><span>💰 Precios y cotizaciones</span><b>28%</b></div><div class="bt"><i style="width:28%;background:var(--orange)"></i></div></div>
+    <div class="brow"><div class="bl"><span>📅 Citas y disponibilidad</span><b>22%</b></div><div class="bt"><i style="width:22%;background:var(--blue)"></i></div></div>
+    <div class="brow"><div class="bl"><span>🦎 Cuidados de exóticos</span><b>16%</b></div><div class="bt"><i style="width:16%;background:var(--teal2)"></i></div></div>
+  </div>
+
+  <div class="rcard" style="margin-top:10px">
+    <div class="list-title" style="margin:2px 0 4px">Actividad por hora</div>
+    <div class="sub" style="margin-bottom:0">Más de la mitad de los mensajes llegan cuando la clínica está cerrada u ocupada.</div>
+    <div class="hourchart" id="hours"></div>
+    <div class="hourlbl"><span>9 AM</span><span>2 PM</span><span>7 PM</span><span>12 AM</span></div>
+    <div class="legend"><span><i style="background:var(--blue)"></i>En horario</span><span><i style="background:var(--red)"></i>Fuera de horario — capturado por Aura</span></div>
   </div>
 
   <div class="list-title">Bandeja de leads</div>
+  <div class="filters" id="filters"></div>
   <div id="leadsList"></div>
 
   <footer>
@@ -50,52 +88,157 @@
 <script src="data.js"></script>
 <script>
 function toast(msg){ const t=document.getElementById('toast'); t.textContent=msg; t.classList.add('show'); setTimeout(()=>t.classList.remove('show'),2600); }
-function contact(btn,who){ btn.classList.add('sent'); btn.textContent='✓ Marcado como contactado'; toast('✓ '+who+' marcado como contactado'); }
-function vreg(btn,who){ btn.classList.add('sent'); btn.textContent='✓ Registrado en tu sistema'; toast('✓ '+who+' listo para registrar en tu sistema'); }
 
-let LIVE = [];
+// ---------- confeti (colores de la marca) ----------
+const CCOLORS = ['#E02A21','#F5A21B','#F2DC16','#62B5B0','#2C90D0','#DCEAF5'];
+function confetti(n){
+  for(let i=0;i<(n||60);i++){
+    const p=document.createElement('div'); p.className='cpiece';
+    p.style.left=(Math.random()*100)+'vw';
+    p.style.background=CCOLORS[i%CCOLORS.length];
+    p.style.animationDuration=(2.2+Math.random()*1.6)+'s';
+    p.style.animationDelay=(Math.random()*0.5)+'s';
+    p.style.transform='rotate('+(Math.random()*360)+'deg)';
+    document.body.appendChild(p);
+    setTimeout(()=>p.remove(), 4600);
+  }
+}
+
+// ---------- gráfica de horas (demo) ----------
+const HOURS = [3,4,2,5,4,3,6,4,5,7,6,8,9,7,5]; // 9AM..11PM
+const OFF_FROM = 10; // desde 7PM = fuera de horario
+(function(){
+  const box=document.getElementById('hours');
+  const mx=Math.max(...HOURS);
+  HOURS.forEach((v,i)=>{
+    const b=document.createElement('div'); b.className='hb'+(i>=OFF_FROM?' off':'');
+    b.style.height=Math.round(v/mx*100)+'%'; box.appendChild(b);
+  });
+})();
+
+// ---------- estado ----------
+let LIVE = [];                 // leads de Supabase
+const LOCAL_ESTADOS = {};      // estados de los leads demo (solo memoria)
+let FILTER = 'todos';
+let lastCount = null;
+let moneyShown = 0;
+
+const NEXT = { nuevo:'contactado', contactado:'convertido', convertido:'nuevo' };
+function badgeOf(l){
+  if(l.estado==='convertido') return ['CONVERTIDO ✓','b-new'];
+  if(l.estado==='contactado') return ['CONTACTADO','b-rec'];
+  if(l.urgente) return ['URGENCIA','b-hot'];
+  return ['NUEVO','b-cita'];
+}
+function valueOf(l){ return l.urgente ? 450 : 350; }
+function digits(s){ return String(s||'').replace(/\D/g,''); }
 function fmtWhen(ts){
-  const d = new Date(ts); let h=d.getHours(),m=String(d.getMinutes()).padStart(2,'0');
+  const d=new Date(ts); let h=d.getHours(),m=String(d.getMinutes()).padStart(2,'0');
   const ap=h>=12?'PM':'AM'; h=h%12||12;
   return h+':'+m+' '+ap+' · capturado por Aura';
 }
-function renderLeads(){
+
+function allLeads(){
+  const vivos = LIVE.map(l=>({ src:'sb', id:l.id, emoji:'💬', who:l.owner||'—', phone:l.phone||'', pet:l.pet||'—',
+    what:(l.motivo||'Consulta')+(l.horario?(' — prefiere: '+l.horario):''),
+    when:fmtWhen(l.created_at||Date.now()), urgente:!!l.urgente, estado:l.estado||'nuevo' }));
+  const locales = dpGetUserLeads().slice().reverse().map((l,i)=>({ src:'ls', id:'ls'+i, emoji:'💬', who:l.owner, phone:l.phone||'', pet:l.pet,
+    what:(l.motivo||'Consulta')+(l.horario?(' — prefiere: '+l.horario):''),
+    when:'ahora mismo · capturado por Aura', urgente:!!l.urgente, estado:'nuevo' }));
+  const demo = DP.leads.map(l=>({ src:'demo', id:l.id, emoji:l.emoji, who:l.who, phone:l.phone, pet:l.pet,
+    what:l.what, when:l.when, urgente:l.cls==='b-hot', estado: LOCAL_ESTADOS[l.id] || l.estado }));
+  return vivos.concat(locales).concat(demo);
+}
+
+function setEstado(id, src){
+  const leads = allLeads(); const l = leads.find(x=>x.id===id); if(!l) return;
+  const nuevo = NEXT[l.estado];
+  if(src==='sb'){ sbUpdateEstado(id, nuevo).catch(()=>{}); const r=LIVE.find(x=>x.id===id); if(r) r.estado=nuevo; }
+  else { LOCAL_ESTADOS[id]=nuevo; }
+  render();
+  toast(nuevo==='contactado' ? '📞 Marcado como contactado' : nuevo==='convertido' ? '🎉 ¡Cliente convertido!' : '↩︎ Regresado a nuevo');
+  if(nuevo==='convertido') confetti(50);
+}
+
+function copyLead(id){
+  const l = allLeads().find(x=>x.id===id); if(!l) return;
+  const txt = 'LEAD AURA · DOGTOR PETS\nCliente: '+l.who+'\nTel: '+(l.phone||'—')+'\nMascota: '+l.pet+'\nMotivo: '+l.what+'\nRecibido: '+l.when;
+  navigator.clipboard.writeText(txt).then(()=>toast('📋 Datos copiados — péguelos en su sistema'));
+}
+
+function waLink(phone, who){
+  const d = digits(phone);
+  if(d.length < 10) return null;
+  const num = d.length===10 ? '52'+d : d;
+  return 'https://wa.me/'+num+'?text='+encodeURIComponent('Hola '+who+', le saludamos de DOGTOR PETS 🐾 sobre su solicitud con Aura.');
+}
+
+function render(flashFirst){
+  const leads = allLeads();
+  // stats
+  document.getElementById('st-leads').textContent = leads.length;
+  document.getElementById('st-urg').textContent = leads.filter(l=>l.urgente).length;
+  const total = leads.reduce((s,l)=>s+valueOf(l),0);
+  countTo(total);
+  // filtros
+  const counts = { todos:leads.length, urgentes:leads.filter(l=>l.urgente).length,
+    nuevos:leads.filter(l=>l.estado==='nuevo').length, contactados:leads.filter(l=>l.estado==='contactado').length,
+    convertidos:leads.filter(l=>l.estado==='convertido').length };
+  const fbox=document.getElementById('filters'); fbox.innerHTML='';
+  [['todos','Todos'],['urgentes','🚨 Urgentes'],['nuevos','Nuevos'],['contactados','Contactados'],['convertidos','Convertidos']].forEach(([k,lab])=>{
+    const b=document.createElement('button'); b.className='fchip'+(FILTER===k?' active':'');
+    b.textContent=lab+' ('+counts[k]+')'; b.onclick=()=>{FILTER=k;render();}; fbox.appendChild(b);
+  });
+  // bandeja
+  const show = leads.filter(l=> FILTER==='todos' ? true : FILTER==='urgentes' ? l.urgente : l.estado===FILTER.slice(0,-1));
   const box=document.getElementById('leadsList'); box.innerHTML='';
-  const vivos = LIVE.map(l=>({
-    emoji:'💬', who:l.owner||'—', phone:'capturado en el chat', pet:l.pet||'—',
-    what:(l.motivo||'Consulta')+(l.horario?(' — prefiere: '+l.horario):''),
-    when: fmtWhen(l.created_at || Date.now()),
-    badge: l.urgente?'URGENCIA ✨':'NUEVO ✨', cls: l.urgente?'b-hot':'b-new'
-  }));
-  const locales = dpGetUserLeads().slice().reverse().map(l=>({
-    emoji:'💬', who:l.owner, phone:'capturado en el chat', pet:l.pet,
-    what:(l.motivo||'Consulta')+(l.horario?(' — prefiere: '+l.horario):''),
-    when:'ahora mismo · capturado por Aura',
-    badge: l.urgente?'URGENCIA ✨':'NUEVO ✨', cls: l.urgente?'b-hot':'b-new'
-  }));
-  vivos.concat(locales).concat(DP.leads).forEach(l=>{
-    const d=document.createElement('div'); d.className='rcard';
+  if(!show.length){ box.innerHTML='<p class="sub">Sin leads en este filtro.</p>'; return; }
+  show.forEach((l,idx)=>{
+    const [btxt,bcls]=badgeOf(l);
+    const wa = waLink(l.phone,l.who);
+    const d=document.createElement('div'); d.className='rcard'+(flashFirst&&idx===0?' flash':'');
     d.innerHTML='<div class="lead" style="border:none;padding:0;margin:0">'+
       '<div class="emoji">'+l.emoji+'</div>'+
-      '<div class="info"><div class="who">'+l.who+' <span style="color:var(--muted);font-weight:400">· '+l.phone+'</span></div>'+
+      '<div class="info"><div class="who">'+l.who+' <span style="color:var(--muted);font-weight:400">· '+(l.phone||'sin teléfono')+'</span></div>'+
       '<div class="who" style="font-size:13px">'+l.pet+'</div>'+
       '<div class="what">'+l.what+'</div><div class="hour">'+l.when+'</div></div>'+
-      '<span class="badge '+l.cls+'">'+l.badge+'</span></div>'+
-      '<div style="display:flex;gap:8px;margin-top:9px">'+
-      '<button class="send" style="margin-top:0" onclick="contact(this,\''+l.who+'\')">📞 Marcar contactado</button>'+
-      '<button class="send" style="margin-top:0" onclick="vreg(this,\''+l.who+'\')">→ Registrar en tu sistema</button></div>';
+      '<span class="badge '+bcls+'">'+btxt+'</span></div>'+
+      '<div class="acts">'+
+      (wa?('<a class="send" style="text-decoration:none;text-align:center" href="'+wa+'" target="_blank" rel="noopener">📲 WhatsApp</a>'):'')+
+      '<button class="send" onclick="setEstado(\''+l.id+'\',\''+l.src+'\')">'+(l.estado==='nuevo'?'📞 Marcar contactado':l.estado==='contactado'?'🎉 Marcar convertido':'↩︎ Regresar a nuevo')+'</button>'+
+      '<button class="send" onclick="copyLead(\''+l.id+'\')">📋 Copiar datos</button>'+
+      '</div>';
     box.appendChild(d);
   });
-  document.getElementById('st-leads').textContent = 5 + LIVE.length + dpGetUserLeads().length;
 }
+
+// contador animado de dinero
+function countTo(target){
+  const el=document.getElementById('money');
+  const from=moneyShown, diff=target-from;
+  if(diff===0){ el.textContent=target.toLocaleString('es-MX'); return; }
+  const t0=performance.now();
+  function step(t){
+    const k=Math.min(1,(t-t0)/700);
+    el.textContent=Math.round(from+diff*k).toLocaleString('es-MX');
+    if(k<1) requestAnimationFrame(step); else moneyShown=target;
+  }
+  requestAnimationFrame(step);
+}
+
 async function refresh(){
   try{
     const rows = await sbFetchLeads();
-    if(rows.length !== LIVE.length){ LIVE = rows; renderLeads(); }
-    else { LIVE = rows; }
-  }catch(e){ /* sin conexión: se muestran demo + locales */ }
+    const grew = lastCount!==null && rows.length>lastCount;
+    LIVE = rows;
+    if(lastCount===null || rows.length!==lastCount){
+      render(grew);
+      if(grew){ confetti(70); toast('✨ ¡Nuevo lead capturado por Aura!'); }
+    }
+    lastCount = rows.length;
+  }catch(e){ if(lastCount===null){ render(); lastCount=-1; } }
 }
-renderLeads();
+render();
 refresh();
 setInterval(refresh, 6000);
 </script>
