@@ -25,7 +25,26 @@ const DP = {
   ],
 };
 
-// ---------- Leads capturados en vivo desde el asistente ----------
+// ---------- Supabase: leads en vivo (tabla dogtor_leads) ----------
+const SB_URL = "https://myzanwpvtnrznjofmtwh.supabase.co";
+const SB_KEY = "sb_publishable_dxKvXVg1nDXUFfj-vwgGFA_cS__ZjZ-";
+const SB_H = { "apikey": SB_KEY, "Authorization": "Bearer " + SB_KEY, "Content-Type": "application/json" };
+
+async function sbInsertLead(l){
+  const r = await fetch(SB_URL + "/rest/v1/dogtor_leads", {
+    method: "POST",
+    headers: { ...SB_H, "Prefer": "return=minimal" },
+    body: JSON.stringify({ owner:l.owner, pet:l.pet, species:l.species||null, horario:l.horario||null, motivo:l.motivo||null, urgente:!!l.urgente })
+  });
+  if(!r.ok) throw new Error("supabase " + r.status);
+}
+async function sbFetchLeads(){
+  const r = await fetch(SB_URL + "/rest/v1/dogtor_leads?select=*&order=created_at.desc&limit=50", { headers: SB_H });
+  if(!r.ok) throw new Error("supabase " + r.status);
+  return r.json();
+}
+
+// ---------- Respaldo local (si Supabase no responde) ----------
 function dpGetUserLeads(){
   try { return JSON.parse(localStorage.getItem("dp_leads") || "[]"); } catch(e){ return []; }
 }
