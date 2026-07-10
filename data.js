@@ -7,21 +7,27 @@ const DP = {
 
   // Leads precargados del "día de hoy"
   leads: [
-    { id:"l1", emoji:"🦔", who:"Mariana G.", phone:"81 •••• ••34", pet:"Kiwi · Hurón, 2 años",
+    { id:"l1", emoji:"🦔", who:"Mariana G.", phone:"81 1234 5634", pet:"Kiwi · Hurón, 2 años",
       what:"Urgencia: no come desde la tarde, decaído. Pide espacio mañana temprano.",
       when:"11:03 PM · fuera de horario", cls:"b-hot", estado:"nuevo" },
-    { id:"l2", emoji:"🦜", who:"Roberto M.", phone:"81 •••• ••09", pet:"Coco · Perico australiano",
+    { id:"l2", emoji:"🦜", who:"Roberto M.", phone:"81 2345 6709", pet:"Coco · Perico australiano",
       what:"Pregunta por recorte de alas y revisión general. Prefiere sábado en la mañana.",
       when:"9:41 PM · fuera de horario", cls:"b-cita", estado:"nuevo" },
-    { id:"l3", emoji:"🐈", who:"Luis T.", phone:"81 •••• ••88", pet:"Nube · Gata, 1 año",
+    { id:"l3", emoji:"🐈", who:"Luis T.", phone:"81 3456 7888", pet:"Nube · Gata, 1 año",
       what:"Preguntó precio de esterilización — información enviada por el asistente.",
       when:"7:52 PM", cls:"b-rec", estado:"contactado" },
-    { id:"l4", emoji:"🦎", who:"Paola R.", phone:"81 •••• ••51", pet:"Rango · Gecko leopardo",
+    { id:"l4", emoji:"🦎", who:"Paola R.", phone:"81 4567 8951", pet:"Rango · Gecko leopardo",
       what:"Duda de temperatura del terrario — orientado por el asistente, se le sugirió revisión.",
       when:"6:15 PM", cls:"b-cita", estado:"contactado" },
-    { id:"l5", emoji:"🐕", who:"Fam. Garza", phone:"81 •••• ••87", pet:"Max · Labrador, 4 años",
+    { id:"l5", emoji:"🐕", who:"Fam. Garza", phone:"81 5678 9087", pet:"Max · Labrador, 4 años",
       what:"Solicitó vacunación a domicilio — se le explicó que es en clínica, aceptó llevarlo.",
       when:"1:20 PM", cls:"b-new", estado:"convertido" },
+    { id:"l6", emoji:"👀", who:"Visitante", phone:"", pet:"— · Tortuga",
+      what:"Preguntó si atienden tortugas y el horario. No dejó datos — atendido por Aura sin escalar.",
+      when:"10:12 PM · fuera de horario", cls:"b-rec", estado:"nuevo", tipo:"curioso" },
+    { id:"l7", emoji:"👀", who:"Visitante", phone:"", pet:"— · Perro",
+      what:"Preguntó precio de baño y estética. Se le compartió la lista — no dejó datos.",
+      when:"4:47 PM", cls:"b-rec", estado:"nuevo", tipo:"curioso" },
   ],
 };
 

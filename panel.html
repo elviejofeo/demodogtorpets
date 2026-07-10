@@ -125,12 +125,13 @@ let moneyShown = 0;
 
 const NEXT = { nuevo:'contactado', contactado:'convertido', convertido:'nuevo' };
 function badgeOf(l){
+  if(l.tipo==='curioso') return ['CURIOSO · filtrado','b-rec'];
   if(l.estado==='convertido') return ['CONVERTIDO ✓','b-new'];
   if(l.estado==='contactado') return ['CONTACTADO','b-rec'];
   if(l.urgente) return ['URGENCIA','b-hot'];
   return ['NUEVO','b-cita'];
 }
-function valueOf(l){ return l.urgente ? 450 : 350; }
+function valueOf(l){ if(l.tipo==='curioso') return 0; return l.urgente ? 450 : 350; }
 function digits(s){ return String(s||'').replace(/\D/g,''); }
 function fmtWhen(ts){
   const d=new Date(ts); let h=d.getHours(),m=String(d.getMinutes()).padStart(2,'0');
@@ -146,7 +147,7 @@ function allLeads(){
     what:(l.motivo||'Consulta')+(l.horario?(' — prefiere: '+l.horario):''),
     when:'ahora mismo · capturado por Aura', urgente:!!l.urgente, estado:'nuevo' }));
   const demo = DP.leads.map(l=>({ src:'demo', id:l.id, emoji:l.emoji, who:l.who, phone:l.phone, pet:l.pet,
-    what:l.what, when:l.when, urgente:l.cls==='b-hot', estado: LOCAL_ESTADOS[l.id] || l.estado }));
+    what:l.what, when:l.when, urgente:l.cls==='b-hot', estado: LOCAL_ESTADOS[l.id] || l.estado, tipo:l.tipo||'lead' }));
   return vivos.concat(locales).concat(demo);
 }
 
@@ -181,16 +182,16 @@ function render(flashFirst){
   const total = leads.reduce((s,l)=>s+valueOf(l),0);
   countTo(total);
   // filtros
-  const counts = { todos:leads.length, urgentes:leads.filter(l=>l.urgente).length,
-    nuevos:leads.filter(l=>l.estado==='nuevo').length, contactados:leads.filter(l=>l.estado==='contactado').length,
-    convertidos:leads.filter(l=>l.estado==='convertido').length };
+  const counts = { todos:leads.filter(l=>l.tipo!=='curioso').length, urgentes:leads.filter(l=>l.urgente).length,
+    nuevos:leads.filter(l=>l.estado==='nuevo'&&l.tipo!=='curioso').length, contactados:leads.filter(l=>l.estado==='contactado').length,
+    convertidos:leads.filter(l=>l.estado==='convertido').length, curiosos:leads.filter(l=>l.tipo==='curioso').length };
   const fbox=document.getElementById('filters'); fbox.innerHTML='';
-  [['todos','Todos'],['urgentes','🚨 Urgentes'],['nuevos','Nuevos'],['contactados','Contactados'],['convertidos','Convertidos']].forEach(([k,lab])=>{
+  [['todos','Todos'],['urgentes','🚨 Urgentes'],['nuevos','Nuevos'],['contactados','Contactados'],['convertidos','Convertidos'],['curiosos','👀 Curiosos']].forEach(([k,lab])=>{
     const b=document.createElement('button'); b.className='fchip'+(FILTER===k?' active':'');
     b.textContent=lab+' ('+counts[k]+')'; b.onclick=()=>{FILTER=k;render();}; fbox.appendChild(b);
   });
   // bandeja
-  const show = leads.filter(l=> FILTER==='todos' ? true : FILTER==='urgentes' ? l.urgente : l.estado===FILTER.slice(0,-1));
+  const show = leads.filter(l=> FILTER==='todos' ? l.tipo!=='curioso' : FILTER==='urgentes' ? l.urgente : FILTER==='curiosos' ? l.tipo==='curioso' : (l.estado===FILTER.slice(0,-1) && l.tipo!=='curioso'));
   const box=document.getElementById('leadsList'); box.innerHTML='';
   if(!show.length){ box.innerHTML='<p class="sub">Sin leads en este filtro.</p>'; return; }
   show.forEach((l,idx)=>{
