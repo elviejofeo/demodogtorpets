@@ -53,15 +53,27 @@ function toast(msg){ const t=document.getElementById('toast'); t.textContent=msg
 function contact(btn,who){ btn.classList.add('sent'); btn.textContent='✓ Marcado como contactado'; toast('✓ '+who+' marcado como contactado'); }
 function vreg(btn,who){ btn.classList.add('sent'); btn.textContent='✓ Registrado en tu sistema'; toast('✓ '+who+' listo para registrar en tu sistema'); }
 
+let LIVE = [];
+function fmtWhen(ts){
+  const d = new Date(ts); let h=d.getHours(),m=String(d.getMinutes()).padStart(2,'0');
+  const ap=h>=12?'PM':'AM'; h=h%12||12;
+  return h+':'+m+' '+ap+' · capturado por Aura';
+}
 function renderLeads(){
   const box=document.getElementById('leadsList'); box.innerHTML='';
-  const nuevos = dpGetUserLeads().slice().reverse().map(l=>({
-    emoji:'💬', who:l.owner, phone:'capturado en el chat', pet:l.pet,
+  const vivos = LIVE.map(l=>({
+    emoji:'💬', who:l.owner||'—', phone:'capturado en el chat', pet:l.pet||'—',
     what:(l.motivo||'Consulta')+(l.horario?(' — prefiere: '+l.horario):''),
-    when:'ahora mismo · capturado por el asistente',
+    when: fmtWhen(l.created_at || Date.now()),
     badge: l.urgente?'URGENCIA ✨':'NUEVO ✨', cls: l.urgente?'b-hot':'b-new'
   }));
-  nuevos.concat(DP.leads).forEach(l=>{
+  const locales = dpGetUserLeads().slice().reverse().map(l=>({
+    emoji:'💬', who:l.owner, phone:'capturado en el chat', pet:l.pet,
+    what:(l.motivo||'Consulta')+(l.horario?(' — prefiere: '+l.horario):''),
+    when:'ahora mismo · capturado por Aura',
+    badge: l.urgente?'URGENCIA ✨':'NUEVO ✨', cls: l.urgente?'b-hot':'b-new'
+  }));
+  vivos.concat(locales).concat(DP.leads).forEach(l=>{
     const d=document.createElement('div'); d.className='rcard';
     d.innerHTML='<div class="lead" style="border:none;padding:0;margin:0">'+
       '<div class="emoji">'+l.emoji+'</div>'+
@@ -74,9 +86,18 @@ function renderLeads(){
       '<button class="send" style="margin-top:0" onclick="vreg(this,\''+l.who+'\')">→ Registrar en tu sistema</button></div>';
     box.appendChild(d);
   });
-  document.getElementById('st-leads').textContent = 5 + dpGetUserLeads().length;
+  document.getElementById('st-leads').textContent = 5 + LIVE.length + dpGetUserLeads().length;
+}
+async function refresh(){
+  try{
+    const rows = await sbFetchLeads();
+    if(rows.length !== LIVE.length){ LIVE = rows; renderLeads(); }
+    else { LIVE = rows; }
+  }catch(e){ /* sin conexión: se muestran demo + locales */ }
 }
 renderLeads();
+refresh();
+setInterval(refresh, 6000);
 </script>
 </body>
 </html>
