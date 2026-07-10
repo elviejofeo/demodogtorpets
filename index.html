@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="Demo de atención con IA — Orquesta Supply">
+<title>Aura · DOGTOR PETS</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Karla:wght@400;500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="styles.css">
+<style>
+  /* Chat a pantalla completa (formato plantilla Aura) */
+  html,body{height:100%}
+  body{display:flex;flex-direction:column}
+  .aura-head{background:#fff;border-bottom:1px solid var(--line);text-align:center;padding:12px 16px 10px}
+  .aura-kicker{font-size:10.5px;font-weight:700;letter-spacing:2.5px;text-transform:uppercase;color:#9AA0A6}
+  .aura-title{font-family:'Archivo Black',sans-serif;font-size:17px;margin-top:3px;color:var(--ink)}
+  .aura-logo{display:inline-grid;grid-template-columns:repeat(6,16px);grid-auto-rows:16px;gap:2px;margin-top:7px}
+  .aura-logo span{display:flex;align-items:center;justify-content:center;font-size:10px;border-radius:2px}
+  .aura-logo span em{filter:brightness(0);font-style:normal}
+  .chatwrap{flex:1;display:flex;flex-direction:column;max-width:560px;width:100%;margin:0 auto;padding:10px 12px;min-height:0}
+  .phone{flex:1;min-height:0;height:auto}
+  .aura-foot{max-width:560px;width:100%;margin:0 auto;padding:8px 16px 14px;font-size:12px;color:var(--muted);text-align:center;line-height:1.5}
+  .aura-foot a{color:var(--muted)}
+</style>
+</head>
+<body>
+
+<div class="aura-head">
+  <div class="aura-kicker">Orquesta Supply · Demo</div>
+  <div class="aura-title">Asistente de DOGTOR PETS</div>
+  <div class="aura-logo"><span style="background:var(--red)"><em>🐕</em></span><span style="background:var(--orange)"><em>🐒</em></span><span style="background:var(--yellow)"><em>🐢</em></span><span style="background:var(--teal2)"><em>🦜</em></span><span style="background:var(--blue)"><em>🐭</em></span><span style="background:var(--sky)"><em>🐰</em></span></div>
+</div>
+
+<div class="chatwrap">
+  <div class="phone">
+    <div class="phone-top">
+      <div class="avatar" style="color:var(--wa-head);font-family:'Archivo Black',sans-serif;font-size:16px">A</div>
+      <div>
+        <div class="name">Aura · DOGTOR PETS</div>
+        <div class="status">en línea · responde al instante</div>
+      </div>
+    </div>
+    <div class="chat" id="chat"></div>
+    <div class="chips" id="chips"></div>
+    <div class="inputbar">
+      <input id="inp" type="text" placeholder="Escriba un mensaje…" autocomplete="off">
+      <button id="sendBtn" aria-label="Enviar">➤</button>
+    </div>
+  </div>
+</div>
+
+<div class="aura-foot">
+  Demo de muestra · Orquesta Supply. Pregúntele a Aura por urgencias, precios de consulta, horarios o si atienden a su especie (hurones, reptiles, aves…).
+  <br><a href="panel.html">Ver panel de leads →</a>
+</div>
+<div class="toast" id="toast"></div>
+
+<script src="data.js"></script>
+<script>
+const chat  = document.getElementById('chat');
+const chips = document.getElementById('chips');
+const inp   = document.getElementById('inp');
+
+function now(){ const d=new Date(); let h=d.getHours(),m=String(d.getMinutes()).padStart(2,'0'); const ap=h>=12?'PM':'AM'; h=h%12||12; return h+':'+m+' '+ap; }
+function scrollBottom(){ chat.scrollTop = chat.scrollHeight; }
+function escapeHtml(s){ return s.replace(/[&<>"']/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+function addMsg(html, who){
+  const el=document.createElement('div'); el.className='msg '+(who==='user'?'in':'out');
+  el.innerHTML = html + '<span class="t">'+now()+(who==='user'?' ✓✓':'')+'</span>';
+  chat.appendChild(el); scrollBottom();
+}
+function typing(on){
+  document.querySelectorAll('.typing').forEach(x=>x.remove());
+  if(on){ const t=document.createElement('div'); t.className='typing'; t.innerHTML='<i></i><i></i><i></i>'; chat.appendChild(t); scrollBottom(); }
+}
+function setChips(list){
+  chips.innerHTML='';
+  list.forEach(c=>{ const b=document.createElement('button'); b.className='chip'; b.textContent=c; b.onclick=()=>handleUser(c); chips.appendChild(b); });
+}
+function toast(msg){ const t=document.getElementById('toast'); t.textContent=msg; t.classList.add('show'); setTimeout(()=>t.classList.remove('show'),2600); }
+function setStatus(txt){ document.querySelector('.phone-top .status').textContent = txt; }
+
+const BASE_CHIPS = ['🚨 Urgencia','📅 Solicitar cita','💰 Precios','🕐 Horarios'];
+
+// ================= IA real vía /api/chat =================
+let AI_MODE = null;
+const HISTORY = [];
+async function askAI(text){
+  HISTORY.push({role:'user', content:text});
+  const r = await fetch('/api/chat', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ messages: HISTORY }) });
+  if(!r.ok){ HISTORY.pop(); throw new Error('api '+r.status); }
+  const data = await r.json();
+  const raw = data.reply || '';
+  HISTORY.push({role:'assistant', content:raw});
+  return raw;
+}
+function processAIReply(raw){
+  const m = raw.match(/\[LEAD\](\{[\s\S]*?\})/);
+  let visible = raw.replace(/\[LEAD\]\{[\s\S]*?\}/,'').trim();
+  if(m){
+    try{
+      const c = JSON.parse(m[1]);
+      dpSaveUserLead({ owner:c.owner||'—', pet:(c.pet||'—')+' · '+(c.species||'mascota'),
+        motivo:c.motivo||'Consulta', horario:c.horario||'', urgente:!!c.urgente, ts:Date.now() });
+      toast('✅ Lead capturado — véalo en el panel');
+    }catch(e){}
+  }
+  return escapeHtml(visible).replace(/\n/g,'<br>');
+}
+
+// ================= Respaldo local (si la API no responde) =================
+const S = { step:'start', motivo:null, urgente:false, pet:null, species:null, owner:null, horario:null };
+const KW = {
+  urgencia:['no come','no ha comido','vomit','vómit','sangr','decaid','decaíd','urgen','malit','enferm','herid','no se mueve','diarrea','respira','convuls','envenen','intoxic','triste','débil','debil','quieto','frío','frio'],
+  cita:['cita','consulta','agendar','apartar','revis','vacun','desparasit','esteriliz','chequeo','valoraci'],
+  precio:['precio','cuánto','cuanto','costo','cobran','tarifa'],
+  horario:['horario','abren','cierran','domingo','sábado','sabado'],
+  saludo:['hola','buenas','buenos','qué tal','que tal','hey','buen día','buen dia'],
+  gracias:['gracias','perfecto','vale','listo'],
+};
+const SPECIES = [['hurón','Hurón'],['huron','Hurón'],['perro','Perro'],['cachorro','Perro'],['gato','Gato'],['iguana','Iguana'],['gecko','Gecko'],['reptil','Reptil'],['tortuga','Tortuga'],['perico','Perico'],['loro','Loro'],['ave','Ave'],['pájaro','Ave'],['pajaro','Ave'],['conejo','Conejo'],['erizo','Erizo'],['hámster','Hámster'],['hamster','Hámster'],['serpiente','Serpiente'],['mono','Primate']];
+function detect(t,keys){ t=t.toLowerCase(); return keys.some(k=>t.includes(k)); }
+function detectSpecies(t){ t=t.toLowerCase(); for(const [k,v] of SPECIES){ if(t.includes(k)) return v; } return null; }
+function urgentAdvice(sp){
+  const map={'Hurón':'Que un hurón deje de comer amerita revisión pronto — su metabolismo es muy rápido. Manténgalo hidratado, tibio y tranquilo.','Conejo':'Un conejo que deja de comer es urgente (riesgo de estasis gastrointestinal). Ofrézcale heno y agua y no lo deje pasar de hoy.','Erizo':'Manténgalo tibio — los erizos se aletargan con el frío — y con agua disponible.','Iguana':'En reptiles la falta de apetito suele ser de temperatura o UVB. Revise su zona caliente y manténgalo hidratado.','Gecko':'Revise la temperatura del terrario y el agua; si pasa de 2-3 días sin comer, amerita revisión.','Reptil':'Revise temperatura y UVB del terrario; más de 2 días sin comer amerita revisión.','Perico':'Un ave decaída debe revisarse pronto — ocultan la enfermedad hasta etapas avanzadas. Manténgala abrigada.','Ave':'Un ave decaída debe revisarse pronto. Manténgala abrigada y sin corrientes de aire.','Perro':'Manténgalo hidratado y en observación; si hay vómito repetido o mucha debilidad, es urgente.','Gato':'Un gato que no come más de 24 horas amerita revisión pronto. Manténgalo hidratado.'};
+  return map[sp]||'Mantenga a su mascota hidratada, tibia y tranquila mientras la revisamos.';
+}
+async function botSay(text, delay){
+  return new Promise(res=>{ typing(true); setTimeout(()=>{ typing(false); addMsg(text,'bot'); res(); }, delay||900); });
+}
+async function route(text){
+  const sp = detectSpecies(text); if(sp && !S.species) S.species = sp;
+  if(S.step==='ask_pet'){ S.pet=text.replace(/^se llama /i,'').trim(); return S.species?askOwner():askSpecies(); }
+  if(S.step==='ask_species'){ S.species=sp||text.trim(); return askOwner(); }
+  if(S.step==='ask_owner'){ S.owner=text.trim(); return askHorario(); }
+  if(S.step==='ask_horario'){ S.horario=text.trim(); return saveLead(); }
+  if(detect(text,KW.urgencia)){ S.urgente=true; S.motivo=text; S.step='ask_pet';
+    await botSay('Lamento que su compañerito no se sienta bien 🐾 Con gusto le ayudamos — atendemos domésticos y también especies exóticas.'+(S.species?' '+urgentAdvice(S.species):''));
+    await botSay('¿Cómo se llama su mascota?'); return; }
+  if(detect(text,KW.cita)){ S.motivo=text; S.step='ask_pet'; await botSay('¡Con gusto! 📅 ¿Cómo se llama su mascota?'); return; }
+  if(detect(text,KW.precio)){ await botSay('Le comparto precios de referencia:<br>• Consulta general: $350<br>• Consulta exóticos: $450<br>• Vacunación: desde $280<br>• Estética: desde $250<br>El doctor confirma el total en la revisión 🙂');
+    await botSay('¿Le agendo una valoración?'); setChips(['📅 Sí, solicitar cita','🕐 Horarios']); return; }
+  if(detect(text,KW.horario)){ await botSay('Nuestro horario:<br>• Lun a Vie: 9:00 AM – 7:00 PM<br>• Sábado: 9:00 AM – 2:00 PM<br>• Domingo cerrado — pero este chat le atiende 24/7 😉'); setChips(BASE_CHIPS); return; }
+  if(sp && detect(text,['atienden','ven ','reciben','tratan','especialista'])){ await botSay('¡Sí! En DOGTOR PETS atendemos '+sp.toLowerCase()+'s y otras especies exóticas 🐾 ¿Le agendo una revisión?'); setChips(['📅 Sí, solicitar cita','💰 Precios']); return; }
+  if(detect(text,KW.saludo)){ await botSay('¡Buen día! Le saluda Aura, asistente de DOGTOR PETS 🐾 ¿En qué puedo apoyarle?'); setChips(BASE_CHIPS); return; }
+  if(detect(text,KW.gracias)){ await botSay('¡Con mucho gusto! Aquí estoy a cualquier hora si algo se le ofrece 🐾'); return; }
+  await botSay('Le leo 🙂 Puedo apoyarle con <b>urgencias</b>, <b>citas</b>, <b>precios</b> y <b>horarios</b>. ¿Qué necesita?'); setChips(BASE_CHIPS);
+}
+async function askSpecies(){ S.step='ask_species'; await botSay('¿Qué especie es '+escapeHtml(S.pet)+'? (perro, gato, hurón, ave, reptil…)'); setChips(['Perro','Gato','Hurón','Perico','Gecko','Conejo']); }
+async function askOwner(){ S.step='ask_owner'; if(S.urgente&&S.species) await botSay(urgentAdvice(S.species)); await botSay('¿A nombre de quién registro la solicitud?'); }
+async function askHorario(){ S.step='ask_horario'; await botSay('Gracias 🙌 ¿Qué día y hora le acomodan'+(S.urgente?' ? Siendo urgencia, le recomiendo lo más pronto posible':'')+'? La clínica le confirma por este medio.'); setChips(['Hoy en la tarde','Mañana temprano','Sábado en la mañana']); }
+async function saveLead(){
+  dpSaveUserLead({ owner:S.owner, pet:(S.pet||'—')+' · '+(S.species||'mascota'), motivo:S.motivo||'Consulta', horario:S.horario, urgente:S.urgente, ts:Date.now() });
+  await botSay('¡Listo! ✅ Registré su solicitud: <b>'+escapeHtml(S.pet)+'</b> ('+escapeHtml(S.species||'mascota')+') · preferencia: '+escapeHtml(S.horario)+'. La clínica le confirma por este medio en breve 🐾');
+  toast('✅ Lead capturado — véalo en el panel');
+  S.step='start'; S.motivo=null; S.urgente=false; S.pet=null; S.species=null; S.owner=null; S.horario=null;
+  setChips(BASE_CHIPS);
+}
+
+// ================= Entrada =================
+async function handleUser(text){
+  if(!text.trim()) return;
+  addMsg(escapeHtml(text),'user');
+  inp.value=''; setChips([]);
+  if(AI_MODE !== false){
+    try{
+      typing(true);
+      const raw = await askAI(text.trim());
+      typing(false);
+      addMsg(processAIReply(raw),'bot');
+      if(AI_MODE===null){ AI_MODE=true; setStatus('en línea · IA en vivo'); }
+      setChips(BASE_CHIPS);
+      return;
+    }catch(e){ typing(false); AI_MODE=false; }
+  }
+  await route(text.trim());
+}
+document.getElementById('sendBtn').onclick=()=>handleUser(inp.value);
+inp.addEventListener('keydown',e=>{ if(e.key==='Enter') handleUser(inp.value); });
+
+(async ()=>{
+  await botSay('¡Buen día! Le saluda <b>Aura</b>, asistente de <b>DOGTOR PETS</b> 🐾 Con gusto le ayudo con dudas de su mascota, urgencias y citas — atendemos domésticos y especies exóticas. ¿En qué puedo apoyarle?', 700);
+  setChips(BASE_CHIPS);
+})();
+</script>
+</body>
+</html>
