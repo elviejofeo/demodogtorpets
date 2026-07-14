@@ -3,192 +3,649 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="description" content="Demo de atención con IA — Orquesta Supply">
-<title>Aura · DOGTOR PETS</title>
+<title>Dogtor Pets · Veterinaria de mascotas exóticas en Guadalupe, NL</title>
+<meta name="description" content="Expertos en mascotas exóticas: consultas, cirugía, radiografías, hotel para exóticos y Dogtor Wash. Guadalupe, N.L. Citas: 812 035 5224.">
+
+<!-- Open Graph: vista previa en WhatsApp/redes -->
+<meta property="og:type" content="website">
+<meta property="og:title" content="Dogtor Pets · Expertos en mascotas exóticas">
+<meta property="og:description" content="Consultas de exóticos, cirugía, radiografías, hotel y SPA. Guadalupe, N.L.">
+<meta property="og:url" content="https://demodogtorpets.vercel.app/">
+<meta property="og:image" content="https://demodogtorpets.vercel.app/img/og.jpg">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:locale" content="es_MX">
+
+<!-- Favicon -->
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%2335B5A9'/%3E%3Cg fill='white'%3E%3Cellipse cx='22' cy='22' rx='6' ry='8'/%3E%3Cellipse cx='42' cy='22' rx='6' ry='8'/%3E%3Cellipse cx='13' cy='34' rx='5' ry='6'/%3E%3Cellipse cx='51' cy='34' rx='5' ry='6'/%3E%3Cpath d='M32 32c8 0 14 6 14 12 0 5-4 8-14 8s-14-3-14-8c0-6 6-12 14-12z'/%3E%3C/g%3E%3C/svg%3E">
+
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Karla:wght@400;500;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="styles.css">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Anton&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
-  /* Chat a pantalla completa (formato plantilla Aura) */
-  html,body{height:100%}
-  body{display:flex;flex-direction:column}
-  .aura-head{background:#fff;border-bottom:1px solid var(--line);text-align:center;padding:12px 16px 10px}
-  .aura-kicker{font-size:10.5px;font-weight:700;letter-spacing:2.5px;text-transform:uppercase;color:#9AA0A6}
-  .aura-title{font-family:'Archivo Black',sans-serif;font-size:17px;margin-top:3px;color:var(--ink)}
-  .aura-logo{display:inline-grid;grid-template-columns:repeat(6,16px);grid-auto-rows:16px;gap:2px;margin-top:7px}
-  .aura-logo span{display:flex;align-items:center;justify-content:center;font-size:10px;border-radius:2px}
-  .aura-logo span em{filter:brightness(0);font-style:normal}
-  .chatwrap{flex:1;display:flex;flex-direction:column;max-width:560px;width:100%;margin:0 auto;padding:10px 12px;min-height:0}
-  .phone{flex:1;min-height:0;height:auto}
-  .aura-foot{max-width:560px;width:100%;margin:0 auto;padding:8px 16px 14px;font-size:12px;color:var(--muted);text-align:center;line-height:1.5}
-  .aura-foot a{color:var(--muted)}
+:root{
+  --rojo:#E63329; --naranja:#F5821F; --amarillo:#FFD200;
+  --azul:#1FA8DF; --celeste:#BEE6F5;
+  --teal:#35B5A9;
+  --negro:#111111;
+  --tinta:#1c1c1c;
+  --gris:#6f6f6f;
+  --linea:#e8e8e8;
+  --fondo:#FFFFFF;
+  --hueso:#F7F7F5;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
+@media (prefers-reduced-motion: reduce){
+  html{scroll-behavior:auto}
+  *,*::before,*::after{animation:none!important;transition:none!important}
+}
+body{
+  font-family:'Inter',system-ui,sans-serif;
+  background:var(--fondo);color:var(--tinta);
+  line-height:1.6;font-size:16px;
+  -webkit-font-smoothing:antialiased;
+}
+img{display:block;max-width:100%}
+a{color:inherit}
+:focus-visible{outline:3px solid var(--teal);outline-offset:3px}
+
+.display{
+  font-family:'Anton',sans-serif;font-weight:400;
+  text-transform:uppercase;line-height:.95;letter-spacing:.01em;
+}
+h2.display{font-size:clamp(2rem,5vw,3.4rem);margin-bottom:14px}
+.sub{color:var(--gris);max-width:56ch;font-size:1.05rem;margin-bottom:44px}
+
+.ico{width:26px;height:26px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;flex:none}
+
+/* Franja de marca */
+.franja{display:inline-flex;overflow:hidden;border-radius:3px}
+.franja span{width:18px;height:18px}
+.franja span:nth-child(1){background:var(--rojo)}
+.franja span:nth-child(2){background:var(--naranja)}
+.franja span:nth-child(3){background:var(--amarillo)}
+.franja span:nth-child(4){background:#fff;border:1px solid var(--linea)}
+.franja span:nth-child(5){background:var(--azul)}
+.franja span:nth-child(6){background:var(--celeste)}
+
+/* Botones */
+.btn{
+  display:inline-flex;align-items:center;gap:10px;
+  font-weight:600;font-size:1rem;text-decoration:none;
+  padding:15px 32px;border-radius:999px;
+  transition:transform .15s ease,opacity .15s ease;
+}
+.btn:hover{transform:scale(1.03)}
+.btn-negro{background:var(--negro);color:#fff}
+.btn-blanco{background:#fff;color:var(--negro)}
+.btn-wa{background:#25D366;color:#fff}
+.btn .ico{width:20px;height:20px}
+
+/* Header */
+header{
+  position:sticky;top:0;z-index:50;
+  background:rgba(255,255,255,.96);backdrop-filter:blur(10px);
+  border-bottom:1px solid var(--linea);
+}
+.header-inner{
+  max-width:1240px;margin:0 auto;
+  display:flex;align-items:center;justify-content:space-between;
+  padding:14px 24px;gap:12px;
+}
+.marca{display:flex;align-items:center;gap:12px;text-decoration:none}
+.marca .nombre{font-family:'Anton',sans-serif;font-size:1.25rem;letter-spacing:.03em;text-transform:uppercase}
+.marca .tag{font-size:.6rem;font-weight:600;letter-spacing:.12em;color:var(--gris);text-transform:uppercase;display:block;margin-top:1px}
+header .btn{padding:10px 22px;font-size:.9rem}
+
+/* Hero */
+.hero{max-width:1240px;margin:0 auto;padding:72px 24px 0}
+.hero .kicker{
+  display:inline-flex;align-items:center;gap:10px;
+  font-size:.8rem;font-weight:700;letter-spacing:.16em;text-transform:uppercase;
+  color:var(--teal);margin-bottom:22px;
+}
+.hero h1{
+  font-family:'Anton',sans-serif;font-weight:400;text-transform:uppercase;
+  font-size:clamp(3rem,10vw,7.5rem);
+  line-height:.92;letter-spacing:.005em;
+  max-width:12ch;
+}
+.hero h1 .outline{
+  color:transparent;-webkit-text-stroke:2px var(--tinta);
+}
+.hero .bajo{
+  display:flex;align-items:flex-end;justify-content:space-between;
+  gap:32px;margin:34px 0 48px;flex-wrap:wrap;
+}
+.hero .bajo p{max-width:44ch;color:var(--gris);font-size:1.1rem}
+.hero-ctas{display:flex;gap:14px;flex-wrap:wrap}
+
+/* Tira fotográfica full-bleed */
+.tira{width:100%;overflow:hidden;background:var(--negro)}
+.tira img{width:100%;height:clamp(180px,32vw,420px);object-fit:cover;object-position:center}
+
+/* Cinta de datos */
+.cinta{background:var(--negro);color:#fff;padding:34px 24px}
+.cinta-inner{
+  max-width:1240px;margin:0 auto;
+  display:grid;grid-template-columns:repeat(3,1fr);gap:20px;text-align:center;
+}
+.dato .num{font-family:'Anton',sans-serif;font-size:clamp(2rem,4.5vw,3.2rem);display:block}
+.dato .lbl{font-size:.82rem;letter-spacing:.12em;text-transform:uppercase;opacity:.7}
+
+section{padding:88px 24px}
+.wrap{max-width:1240px;margin:0 auto}
+
+/* Especies: tiles fotográficos */
+.grid-esp{display:grid;grid-template-columns:repeat(4,1fr);gap:14px}
+.tile{
+  position:relative;aspect-ratio:1/1;overflow:hidden;border-radius:6px;
+  background:var(--hueso);display:block;
+}
+.tile img{width:100%;height:100%;object-fit:cover;transition:transform .4s ease}
+.tile:hover img{transform:scale(1.06)}
+.tile .lbl{
+  position:absolute;left:14px;bottom:12px;z-index:2;
+  font-family:'Anton',sans-serif;text-transform:uppercase;letter-spacing:.04em;
+  color:#fff;font-size:clamp(1rem,1.6vw,1.3rem);
+  text-shadow:0 1px 10px rgba(0,0,0,.5);
+}
+.tile::after{
+  content:"";position:absolute;inset:0;
+  background:linear-gradient(to top,rgba(0,0,0,.45),transparent 45%);
+}
+.tile.plano{display:flex;align-items:center;justify-content:center}
+.tile.plano::after{display:none}
+.tile.plano .lbl{color:var(--tinta);text-shadow:none}
+.tile.plano .sil{font-size:3.4rem;filter:brightness(0);opacity:.85}
+.t-amarillo{background:var(--amarillo)}
+.t-celeste{background:var(--celeste)}
+
+/* Servicios */
+.servicios{background:var(--hueso)}
+.grid-serv{display:grid;grid-template-columns:repeat(4,1fr);gap:14px}
+.serv{
+  background:#fff;border:1px solid var(--linea);border-radius:6px;
+  padding:26px 22px;transition:border-color .2s ease, transform .2s ease;
+}
+.serv:hover{border-color:var(--tinta);transform:translateY(-3px)}
+.serv .ico{width:30px;height:30px;color:var(--teal);margin-bottom:14px}
+.serv h3{font-size:1rem;font-weight:700;margin-bottom:6px;letter-spacing:-.01em}
+.serv p{font-size:.88rem;color:var(--gris)}
+
+/* Caso real */
+.caso .wrap{
+  display:grid;grid-template-columns:1fr 1fr;gap:56px;align-items:center;
+}
+.caso figure{border-radius:6px;overflow:hidden}
+.caso figure img{width:100%;height:100%;object-fit:cover;min-height:380px}
+.caso .kicker{
+  font-size:.78rem;font-weight:700;letter-spacing:.16em;text-transform:uppercase;
+  color:var(--teal);display:block;margin-bottom:14px;
+}
+.caso p{color:var(--gris);margin-bottom:14px}
+.caso p strong{color:var(--tinta)}
+
+/* Hotel + Wash: tarjetas fotográficas */
+.duo{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.card-foto{
+  position:relative;border-radius:6px;overflow:hidden;
+  min-height:520px;display:flex;align-items:flex-end;
+  color:#fff;text-decoration:none;
+}
+.card-foto img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;transition:transform .5s ease}
+.card-foto:hover img{transform:scale(1.04)}
+.card-foto::after{
+  content:"";position:absolute;inset:0;
+  background:linear-gradient(to top,rgba(0,0,0,.72) 0%,rgba(0,0,0,.15) 55%,transparent);
+}
+.card-foto .contenido{position:relative;z-index:2;padding:34px}
+.card-foto .mini{
+  font-size:.75rem;font-weight:700;letter-spacing:.16em;text-transform:uppercase;
+  opacity:.85;display:block;margin-bottom:8px;
+}
+.card-foto h3{
+  font-family:'Anton',sans-serif;font-weight:400;text-transform:uppercase;
+  font-size:clamp(1.6rem,3vw,2.4rem);line-height:1;margin-bottom:10px;
+}
+.card-foto p{max-width:40ch;opacity:.92;font-size:.95rem;margin-bottom:20px}
+
+/* Doctor */
+.doctor{background:var(--negro);color:#fff}
+.doctor .wrap{max-width:900px;text-align:center}
+.doctor blockquote{
+  font-family:'Anton',sans-serif;font-weight:400;text-transform:uppercase;
+  font-size:clamp(1.5rem,3.6vw,2.6rem);line-height:1.15;margin-bottom:22px;
+}
+.doctor cite{
+  font-style:normal;font-size:.85rem;letter-spacing:.14em;text-transform:uppercase;
+  color:var(--teal);font-weight:700;
+}
+
+/* Ubicación */
+.ubica .wrap{display:grid;grid-template-columns:1fr 1.15fr;gap:48px;align-items:start}
+.info-linea{
+  display:flex;gap:16px;align-items:flex-start;
+  padding:20px 0;border-bottom:1px solid var(--linea);
+}
+.info-linea:last-of-type{border-bottom:none}
+.info-linea .ico{color:var(--teal);margin-top:2px}
+.info-linea strong{
+  display:block;font-size:.72rem;font-weight:700;
+  text-transform:uppercase;letter-spacing:.14em;color:var(--gris);margin-bottom:3px;
+}
+.info-linea a{font-weight:600;text-decoration:none}
+.info-linea a:hover{text-decoration:underline}
+.mapa{border-radius:6px;overflow:hidden;min-height:400px;border:1px solid var(--linea)}
+.mapa iframe{width:100%;height:100%;min-height:400px;border:0;display:block}
+
+/* CTA final */
+.cta-final{background:var(--teal);color:#fff;text-align:center}
+.cta-final h2{color:#fff}
+.cta-final p{opacity:.95;margin-bottom:34px}
+.cta-final .franja{margin-bottom:24px}
+
+footer{background:var(--negro);color:#bdbdbd;padding:38px 24px;font-size:.88rem}
+.foot-inner{
+  max-width:1240px;margin:0 auto;
+  display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap;align-items:center;
+}
+footer a{color:#fff;text-decoration:none;font-weight:600}
+footer a:hover{color:var(--amarillo)}
+
+@media(max-width:960px){
+  .grid-serv{grid-template-columns:1fr 1fr}
+  .caso .wrap{grid-template-columns:1fr;gap:28px}
+  .duo{grid-template-columns:1fr}
+  .card-foto{min-height:420px}
+  .ubica .wrap{grid-template-columns:1fr}
+}
+@media(max-width:620px){
+  .grid-esp{grid-template-columns:1fr 1fr}
+  .grid-serv{grid-template-columns:1fr}
+  .cinta-inner{grid-template-columns:1fr 1fr 1fr;gap:8px}
+  section{padding:64px 18px}
+  .hero{padding-top:52px}
+  .marca .nombre{font-size:1.05rem}
+  header .btn span{display:none}
+  header .btn{padding:10px 14px}
+}
+
+/* ---------- Animaciones ---------- */
+.reveal{opacity:0;transform:translateY(28px);transition:opacity .7s ease,transform .7s ease}
+.reveal.visto{opacity:1;transform:none}
+.reveal-d1{transition-delay:.08s}
+.reveal-d2{transition-delay:.16s}
+.reveal-d3{transition-delay:.24s}
+
+/* Entrada del hero */
+@keyframes subir{from{opacity:0;transform:translateY(30px)}to{opacity:1;transform:none}}
+.hero .kicker{animation:subir .6s ease .05s both}
+.hero h1{animation:subir .7s ease .15s both}
+.hero .bajo{animation:subir .7s ease .3s both}
+
+/* Marquee estilo Nike con perro corriendo */
+.marquee{
+  background:var(--negro);color:#fff;overflow:hidden;position:relative;
+  padding:16px 0;border-top:1px solid #2a2a2a;
+}
+.marquee-pista{
+  display:flex;gap:0;white-space:nowrap;width:max-content;
+  animation:desliza 26s linear infinite;
+}
+.marquee-pista span{
+  font-family:'Anton',sans-serif;text-transform:uppercase;
+  font-size:clamp(1rem,2.2vw,1.5rem);letter-spacing:.06em;
+  padding:0 26px;display:inline-flex;align-items:center;gap:26px;
+}
+.marquee-pista .punto{color:var(--teal);font-size:.8em}
+@keyframes desliza{from{transform:translateX(0)}to{transform:translateX(-50%)}}
+.marquee:hover .marquee-pista{animation-play-state:paused}
+
+.perro{
+  position:absolute;bottom:8px;left:-12%;z-index:3;
+  font-size:2rem;pointer-events:none;
+  filter:brightness(10);
+  transform:scaleX(-1);
+  animation:corre 13s linear infinite;
+}
+.perro i{display:inline-block;font-style:normal;animation:trota .35s ease-in-out infinite alternate}
+@keyframes corre{from{left:-12%}to{left:112%}}
+@keyframes trota{from{transform:translateY(0) rotate(-3deg)}to{transform:translateY(-5px) rotate(3deg)}}
+
+@media (prefers-reduced-motion: reduce){
+  .reveal{opacity:1;transform:none}
+  .hero .kicker,.hero h1,.hero .bajo{animation:none}
+  .marquee-pista{animation:none}
+  .perro{display:none}
+}
+
+
+/* ---------- Navegación ---------- */
+nav.principal{display:flex;gap:26px;align-items:center;margin-left:auto;margin-right:22px}
+nav.principal a{
+  text-decoration:none;font-weight:600;font-size:.9rem;color:var(--tinta);
+  padding:6px 2px;border-bottom:2px solid transparent;
+  transition:border-color .15s ease;white-space:nowrap;
+}
+nav.principal a:hover{border-color:var(--teal)}
+@media(max-width:860px){
+  nav.principal{
+    position:fixed;left:0;right:0;top:61px;z-index:49;
+    background:#fff;border-bottom:1px solid var(--linea);
+    padding:10px 18px;margin:0;gap:20px;
+    overflow-x:auto;-webkit-overflow-scrolling:touch;
+  }
+  body{padding-top:0}
+  main{margin-top:46px}
+}
+
+/* ---------- WhatsApp flotante ---------- */
+.wa-flotante{
+  position:fixed;right:20px;bottom:20px;z-index:60;
+  width:60px;height:60px;border-radius:50%;
+  background:#25D366;display:flex;align-items:center;justify-content:center;
+  box-shadow:0 6px 20px rgba(0,0,0,.28);
+  transition:transform .15s ease;
+}
+.wa-flotante:hover{transform:scale(1.08)}
+.wa-flotante .ico{width:30px;height:30px;stroke:#fff}
+@media(max-width:620px){.wa-flotante{width:54px;height:54px;right:14px;bottom:14px}}
+
 </style>
 </head>
 <body>
 
-<div class="aura-head">
-  <div class="aura-kicker">Orquesta Supply · Demo</div>
-  <div class="aura-title">Asistente de DOGTOR PETS</div>
-  <div class="aura-logo"><span style="background:var(--red)"><em>🐕</em></span><span style="background:var(--orange)"><em>🐒</em></span><span style="background:var(--yellow)"><em>🐢</em></span><span style="background:var(--teal2)"><em>🦜</em></span><span style="background:var(--blue)"><em>🐭</em></span><span style="background:var(--sky)"><em>🐰</em></span></div>
-</div>
+<header>
+  <div class="header-inner">
+    <a class="marca" href="#inicio" aria-label="Dogtor Pets, inicio">
+      <span class="franja" aria-hidden="true"><span></span><span></span><span></span><span></span><span></span><span></span></span>
+      <span>
+        <span class="nombre">Dogtor Pets</span>
+        <span class="tag">Domestic &amp; Exotic Veterinary</span>
+      </span>
+    </a>
+    <nav class="principal" aria-label="Navegación principal">
+      <a href="#especies">Especies</a>
+      <a href="#servicios">Servicios</a>
+      <a href="#hotel">Hotel &amp; Wash</a>
+      <a href="#nosotros">Nosotros</a>
+      <a href="#contacto">Contacto</a>
+    </nav>
+    <a class="btn btn-negro" href="https://wa.me/528120355224?text=Hola%2C%20quiero%20agendar%20una%20cita%20para%20mi%20mascota" target="_blank" rel="noopener">
+      <svg class="ico" viewBox="0 0 24 24"><path d="M21 11.5a8.5 8.5 0 0 1-8.5 8.5c-1.5 0-3-.4-4.3-1.1L3 20l1.1-5.2A8.5 8.5 0 1 1 21 11.5z"/></svg>
+      <span>Agendar cita</span>
+    </a>
+  </div>
+</header>
 
-<div class="chatwrap">
-  <div class="phone">
-    <div class="phone-top">
-      <div class="avatar" style="color:var(--wa-head);font-family:'Archivo Black',sans-serif;font-size:16px">A</div>
-      <div>
-        <div class="name">Aura · DOGTOR PETS</div>
-        <div class="status">en línea · responde al instante</div>
+<main id="inicio">
+
+  <!-- HERO -->
+  <div class="hero">
+    <span class="kicker">
+      <span class="franja" aria-hidden="true"><span></span><span></span><span></span><span></span><span></span><span></span></span>
+      Guadalupe · Nuevo León
+    </span>
+    <h1>Expertos en <span class="outline">exóticos</span></h1>
+    <div class="bajo">
+      <p>Medicina veterinaria para mascotas exóticas, no convencionales, animales de zoológico y domésticas. Tu compañero, en las mejores manos.</p>
+      <div class="hero-ctas">
+        <a class="btn btn-wa" href="https://wa.me/528120355224?text=Hola%2C%20quiero%20agendar%20una%20cita" target="_blank" rel="noopener">
+          <svg class="ico" viewBox="0 0 24 24"><path d="M21 11.5a8.5 8.5 0 0 1-8.5 8.5c-1.5 0-3-.4-4.3-1.1L3 20l1.1-5.2A8.5 8.5 0 1 1 21 11.5z"/></svg>
+          Agendar por WhatsApp
+        </a>
+        <a class="btn btn-negro" href="tel:+528120355224">
+          <svg class="ico" viewBox="0 0 24 24"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6A19.79 19.79 0 0 1 2.12 4.18 2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.13.96.36 1.9.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.91.34 1.85.57 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+          812 035 5224
+        </a>
       </div>
     </div>
-    <div class="chat" id="chat"></div>
-    <div class="inputbar">
-      <input id="inp" type="text" placeholder="Escriba un mensaje…" autocomplete="off">
-      <button id="sendBtn" aria-label="Enviar">➤</button>
+  </div>
+
+  <!-- TIRA FOTOGRÁFICA -->
+  <div class="tira" aria-label="Pacientes de Dogtor Pets">
+    <img src="img/trio.jpg" alt="Conejo, cuyo, perico australiano y tortuga: pacientes de Dogtor Pets">
+  </div>
+
+  <!-- CINTA -->
+  <div class="cinta">
+    <div class="cinta-inner">
+      <div class="dato"><span class="num" data-cuenta="98" data-sufijo="%">0%</span><span class="lbl">Recomendación</span></div>
+      <div class="dato"><span class="num" data-cuenta="13" data-sufijo="K">0K</span><span class="lbl">Seguidores</span></div>
+      <div class="dato"><span class="num" data-cuenta="40" data-prefijo="+">+0</span><span class="lbl">Opiniones</span></div>
     </div>
   </div>
-</div>
 
-<div class="aura-foot">
-  Demo de muestra · Orquesta Supply. Pregúntele a Aura por urgencias, precios de consulta, horarios o si atienden a su especie (hurones, reptiles, aves…).
-  <br><a href="panel.html">Ver panel de leads →</a>
-</div>
-<div class="toast" id="toast"></div>
 
-<script src="data.js"></script>
+  <!-- MARQUEE -->
+  <div class="marquee" aria-hidden="true">
+    <div class="marquee-pista">
+      <span>Consultas de exóticos <span class="punto">●</span></span>
+      <span>Cirugía <span class="punto">●</span></span>
+      <span>Radiografías <span class="punto">●</span></span>
+      <span>Hotel para exóticos <span class="punto">●</span></span>
+      <span>Dogtor Wash <span class="punto">●</span></span>
+      <span>Laboratorio <span class="punto">●</span></span>
+      <span>Consultas de exóticos <span class="punto">●</span></span>
+      <span>Cirugía <span class="punto">●</span></span>
+      <span>Radiografías <span class="punto">●</span></span>
+      <span>Hotel para exóticos <span class="punto">●</span></span>
+      <span>Dogtor Wash <span class="punto">●</span></span>
+      <span>Laboratorio <span class="punto">●</span></span>
+    </div>
+    <span class="perro"><i>🐕</i></span>
+  </div>
+
+  <!-- ESPECIES -->
+  <section id="especies">
+    <div class="wrap">
+      <h2 class="display">Atendemos lo que otros no</h2>
+      <p class="sub">Encontrar veterinario para un animal exótico es difícil. Aquí tu mascota tiene un especialista, sin importar cuántas patas, plumas o escamas tenga.</p>
+      <div class="grid-esp">
+        <div class="tile reveal"><img src="img/esp_conejo.jpg" alt="Conejo" loading="lazy"><span class="lbl">Conejos</span></div>
+        <div class="tile reveal"><img src="img/esp_cuyo.jpg" alt="Cuyo" loading="lazy"><span class="lbl">Cuyos</span></div>
+        <div class="tile reveal"><img src="img/esp_perico.jpg" alt="Perico australiano" loading="lazy"><span class="lbl">Aves</span></div>
+        <div class="tile reveal"><img src="img/esp_tortuga.jpg" alt="Tortuga" loading="lazy"><span class="lbl">Reptiles</span></div>
+        <div class="tile reveal plano t-amarillo"><span class="sil" aria-hidden="true">🦔</span><span class="lbl">Erizos</span></div>
+        <div class="tile reveal plano t-celeste"><span class="sil" aria-hidden="true">🐒</span><span class="lbl">Primates</span></div>
+        <div class="tile reveal"><img src="img/esp_perro.jpg" alt="Perro" loading="lazy"><span class="lbl">Perros</span></div>
+        <div class="tile reveal"><img src="img/esp_gato.jpg" alt="Gato" loading="lazy"><span class="lbl">Gatos</span></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- SERVICIOS -->
+  <section id="servicios" class="servicios">
+    <div class="wrap">
+      <h2 class="display">Servicios</h2>
+      <p class="sub">Expertos en su bienestar, especialistas en su cuidado.</p>
+      <div class="grid-serv">
+        <div class="serv reveal">
+          <svg class="ico" viewBox="0 0 24 24"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+          <h3>Consultas de exóticos</h3><p>Consulta especializada adaptada a la fisiología de cada especie.</p>
+        </div>
+        <div class="serv reveal">
+          <svg class="ico" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="4"/><path d="M12 8v8M8 12h8"/></svg>
+          <h3>Cirugía</h3><p>Procedimientos quirúrgicos con seguimiento cercano y recuperación monitoreada.</p>
+        </div>
+        <div class="serv reveal">
+          <svg class="ico" viewBox="0 0 24 24"><path d="M3 7V5a2 2 0 0 1 2-2h2M17 3h2a2 2 0 0 1 2 2v2M21 17v2a2 2 0 0 1-2 2h-2M7 21H5a2 2 0 0 1-2-2v-2M7 12h10M12 8v8"/></svg>
+          <h3>Radiografías</h3><p>Examen radiológico para diagnóstico preciso, en la misma clínica.</p>
+        </div>
+        <div class="serv reveal">
+          <svg class="ico" viewBox="0 0 24 24"><path d="M10 2v6L4 20a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1L14 8V2M8.5 2h7M7 16h10"/></svg>
+          <h3>Laboratorio</h3><p>Estudios clínicos para saber exactamente qué tiene tu mascota.</p>
+        </div>
+        <div class="serv reveal">
+          <svg class="ico" viewBox="0 0 24 24"><path d="M11 20A7 7 0 0 1 4 13c0-4 3-8 9-9 0 0 7 1 7 9a7 7 0 0 1-7 7h-2z"/><path d="M11 20c0-3 1.5-6 5-9"/></svg>
+          <h3>Alimentos especializados</h3><p>Nutrición y manejo específico por especie.</p>
+        </div>
+        <div class="serv reveal">
+          <svg class="ico" viewBox="0 0 24 24"><circle cx="6" cy="6" r="3"/><circle cx="6" cy="18" r="3"/><path d="M20 4 8.5 15.5M14.5 12.5 20 20M8.5 8.5l3.5 3.5"/></svg>
+          <h3>SPA y estética</h3><p>Cuidado y estética con manejo seguro para especies delicadas.</p>
+        </div>
+        <div class="serv reveal">
+          <svg class="ico" viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="M9 12l2 2 4-4"/></svg>
+          <h3>Medicina preventiva</h3><p>Vacunación, chequeos de rutina y campañas de control sano.</p>
+        </div>
+        <div class="serv reveal">
+          <svg class="ico" viewBox="0 0 24 24"><path d="M21 11.5a8.5 8.5 0 0 1-8.5 8.5c-1.5 0-3-.4-4.3-1.1L3 20l1.1-5.2A8.5 8.5 0 1 1 21 11.5z"/></svg>
+          <h3>Asesoría</h3><p>Orientación y acompañamiento para el bienestar de tu compañero.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CASO REAL -->
+  <section id="nosotros" class="caso reveal">
+    <div class="wrap">
+      <figure><img src="img/canela.jpg" alt="Canelita, coneja de 9 años, recuperándose tras su cirugía" loading="lazy"></figure>
+      <div>
+        <span class="kicker">Caso real · Canelita, 9 años</span>
+        <h2 class="display">Diagnóstico que cambia vidas</h2>
+        <p>Canelita llegó con molestias al orinar. <strong>Con examen radiológico detectamos litiasis vesical</strong> — un cálculo en su vejiga — y programamos su cirugía con seguimiento cercano.</p>
+        <p>Hoy Canelita sigue siendo tan feliz como siempre, con una mejor calidad de vida. Ese es el estándar de atención que tu mascota merece.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- HOTEL + WASH -->
+  <section id="hotel" class="servicios">
+    <div class="wrap duo">
+      <a class="card-foto reveal" href="https://wa.me/528120355224?text=Hola%2C%20quiero%20informaci%C3%B3n%20del%20hotel%20para%20mascotas%20ex%C3%B3ticas" target="_blank" rel="noopener">
+        <img src="img/frosty.jpg" alt="Frosty, conejo hospedado en el hotel para mascotas exóticas" loading="lazy">
+        <div class="contenido">
+          <span class="mini">Hotel para exóticos</span>
+          <h3>Tu compañero, cuidado mientras viajas</h3>
+          <p>Hospedaje especializado con supervisión veterinaria profesional, como Frosty, que disfruta su estancia mientras sus propietarios están de viaje.</p>
+          <span class="btn btn-blanco">Reservar hospedaje</span>
+        </div>
+      </a>
+      <a class="card-foto reveal" href="https://wa.me/528120355224?text=Hola%2C%20quiero%20informaci%C3%B3n%20de%20Dogtor%20Wash" target="_blank" rel="noopener">
+        <img src="img/wash.jpg" alt="Perro y gato después de su baño en Dogtor Wash" loading="lazy">
+        <div class="contenido">
+          <span class="mini">Dogtor Wash</span>
+          <h3>Estética canina y felina</h3>
+          <p>Baño, estética y guardería para perros y gatos. Pregunta por nuestras promociones de consulta al traer a baño.</p>
+          <span class="btn btn-blanco">Agendar baño</span>
+        </div>
+      </a>
+    </div>
+  </section>
+
+  <!-- DOCTOR -->
+  <section class="doctor reveal">
+    <div class="wrap">
+      <blockquote>"Cada especie es un mundo distinto. La tratamos con el conocimiento que exige y el cariño que su familia espera."</blockquote>
+      <cite>MVZ Dip. José Luis Perales · Dogtor Pets</cite>
+    </div>
+  </section>
+
+  <!-- UBICACIÓN -->
+  <section id="contacto" class="ubica">
+    <div class="wrap">
+      <div>
+        <h2 class="display">Visítanos</h2>
+        <div class="info-linea">
+          <svg class="ico" viewBox="0 0 24 24"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0z"/><circle cx="12" cy="10" r="3"/></svg>
+          <div><strong>Dirección</strong>Guadalupe #520, Col. Guadalupe Centro,<br>Guadalupe, N.L., C.P. 67100</div>
+        </div>
+        <div class="info-linea">
+          <svg class="ico" viewBox="0 0 24 24"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6A19.79 19.79 0 0 1 2.12 4.18 2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.13.96.36 1.9.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.91.34 1.85.57 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+          <div><strong>Citas</strong><a href="tel:+528120355224">812 035 5224</a> · <a href="tel:+528181814150">818 181 4150</a></div>
+        </div>
+        <div class="info-linea">
+          <svg class="ico" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
+          <div><strong>Horario</strong>Lunes a sábado · 10:00 am a 6:00 pm</div>
+        </div>
+        <div class="info-linea">
+          <svg class="ico" viewBox="0 0 24 24"><rect x="2" y="2" width="20" height="20" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="1" fill="currentColor" stroke="none"/></svg>
+          <div><strong>Redes</strong><a href="https://instagram.com/dogtor_pets" target="_blank" rel="noopener">@dogtor_pets</a> · <a href="https://www.facebook.com/DogtorJoseLuisPerales" target="_blank" rel="noopener">Facebook</a></div>
+        </div>
+      </div>
+      <div class="mapa">
+        <iframe
+          title="Mapa de ubicación de Dogtor Pets"
+          src="https://www.google.com/maps?q=Guadalupe+520,+Guadalupe+Centro,+Guadalupe,+Nuevo+Leon+67100&output=embed"
+          loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
+      </div>
+    </div>
+  </section>
+
+  <!-- CTA FINAL -->
+  <section class="cta-final">
+    <div class="wrap">
+      <div class="franja" aria-hidden="true"><span></span><span></span><span></span><span></span><span></span><span></span></div>
+      <h2 class="display">Agenda su cita hoy</h2>
+      <p>Respondemos por WhatsApp.</p>
+      <a class="btn btn-blanco" href="https://wa.me/528120355224?text=Hola%2C%20quiero%20agendar%20una%20cita%20para%20mi%20mascota" target="_blank" rel="noopener">
+        <svg class="ico" viewBox="0 0 24 24"><path d="M21 11.5a8.5 8.5 0 0 1-8.5 8.5c-1.5 0-3-.4-4.3-1.1L3 20l1.1-5.2A8.5 8.5 0 1 1 21 11.5z"/></svg>
+        Agendar por WhatsApp
+      </a>
+    </div>
+  </section>
+
+</main>
+
+<footer>
+  <div class="foot-inner">
+    <span>© 2026 Dogtor Pets® · Domestic &amp; Exotic Veterinary · Guadalupe, N.L.</span>
+    <span><a href="https://instagram.com/dogtor_pets" target="_blank" rel="noopener">@dogtor_pets</a> · <a href="tel:+528120355224">812 035 5224</a></span>
+  </div>
+</footer>
+
+
+
+<a class="wa-flotante" href="https://wa.me/528120355224?text=Hola%2C%20quiero%20agendar%20una%20cita%20para%20mi%20mascota" target="_blank" rel="noopener" aria-label="Escríbenos por WhatsApp">
+  <svg class="ico" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.5a8.5 8.5 0 0 1-8.5 8.5c-1.5 0-3-.4-4.3-1.1L3 20l1.1-5.2A8.5 8.5 0 1 1 21 11.5z"/></svg>
+</a>
+
 <script>
-const chat  = document.getElementById('chat');
-const inp   = document.getElementById('inp');
+(function(){
+  var reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
-function now(){ const d=new Date(); let h=d.getHours(),m=String(d.getMinutes()).padStart(2,'0'); const ap=h>=12?'PM':'AM'; h=h%12||12; return h+':'+m+' '+ap; }
-function scrollBottom(){ chat.scrollTop = chat.scrollHeight; }
-function escapeHtml(s){ return s.replace(/[&<>"']/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
-function addMsg(html, who){
-  const el=document.createElement('div'); el.className='msg '+(who==='user'?'in':'out');
-  el.innerHTML = html + '<span class="t">'+now()+(who==='user'?' ✓✓':'')+'</span>';
-  chat.appendChild(el); scrollBottom();
-}
-function typing(on){
-  document.querySelectorAll('.typing').forEach(x=>x.remove());
-  if(on){ const t=document.createElement('div'); t.className='typing'; t.innerHTML='<i></i><i></i><i></i>'; chat.appendChild(t); scrollBottom(); }
-}
-function toast(msg){ const t=document.getElementById('toast'); t.textContent=msg; t.classList.add('show'); setTimeout(()=>t.classList.remove('show'),2600); }
-function setStatus(txt){ document.querySelector('.phone-top .status').textContent = txt; }
-
-// ================= IA real vía /api/chat =================
-let AI_MODE = null;
-const HISTORY = [];
-async function askAI(text){
-  HISTORY.push({role:'user', content:text});
-  const r = await fetch('/api/chat', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ messages: HISTORY }) });
-  if(!r.ok){ HISTORY.pop(); throw new Error('api '+r.status); }
-  const data = await r.json();
-  const raw = data.reply || '';
-  HISTORY.push({role:'assistant', content:raw});
-  return raw;
-}
-let CURIOSO_SENT = false;
-let LEAD_SENT = false;
-function registrarCurioso(tema){
-  if(CURIOSO_SENT || LEAD_SENT) return;
-  CURIOSO_SENT = true;
-  sbInsertLead({ owner:'Visitante', pet:'—', species:'', phone:'', motivo:'Preguntó: '+(tema||'información general'), horario:'', urgente:false, tipo:'curioso' }).catch(()=>{});
-}
-function processAIReply(raw){
-  const mc = raw.match(/\[CURIOSO\](\{[\s\S]*?\})/);
-  if(mc){ try{ registrarCurioso(JSON.parse(mc[1]).tema); }catch(e){ registrarCurioso(''); } }
-  raw = raw.replace(/\[CURIOSO\]\{[\s\S]*?\}/,'').trim();
-  const m = raw.match(/\[LEAD\](\{[\s\S]*?\})/);
-  let visible = raw.replace(/\[LEAD\]\{[\s\S]*?\}/,'').trim();
-  if(m){
-    try{
-      const c = JSON.parse(m[1]);
-      const lead = { owner:c.owner||'—', pet:(c.pet||'—')+' · '+(c.species||'mascota'), species:c.species||'', phone:c.phone||'',
-        motivo:c.motivo||'Consulta', horario:c.horario||'', urgente:!!c.urgente, ts:Date.now() };
-      LEAD_SENT = true;
-      sbInsertLead(lead).then(()=>toast('✅ Lead capturado — ya está en el panel'))
-        .catch(()=>{ dpSaveUserLead(lead); toast('✅ Lead capturado (local)'); });
-    }catch(e){}
+  // Reveals al hacer scroll
+  var els = document.querySelectorAll('.reveal');
+  if (reduce || !('IntersectionObserver' in window)) {
+    els.forEach(function(e){ e.classList.add('visto'); });
+  } else {
+    var io = new IntersectionObserver(function(entries){
+      entries.forEach(function(en){
+        if (en.isIntersecting){ en.target.classList.add('visto'); io.unobserve(en.target); }
+      });
+    }, {threshold:.15});
+    els.forEach(function(e){ io.observe(e); });
   }
-  return escapeHtml(visible).replace(/\n/g,'<br>');
-}
 
-// ================= Respaldo local (si la API no responde) =================
-const S = { step:'start', motivo:null, urgente:false, pet:null, species:null, owner:null, phone:null, horario:null };
-let ASKED_INFO = null;
-const KW = {
-  urgencia:['no come','no ha comido','vomit','vómit','sangr','decaid','decaíd','urgen','malit','enferm','herid','no se mueve','diarrea','respira','convuls','envenen','intoxic','triste','débil','debil','quieto','frío','frio'],
-  cita:['cita','consulta','agendar','apartar','revis','vacun','desparasit','esteriliz','chequeo','valoraci'],
-  precio:['precio','cuánto','cuanto','costo','cobran','tarifa'],
-  horario:['horario','abren','cierran','domingo','sábado','sabado'],
-  saludo:['hola','buenas','buenos','qué tal','que tal','hey','buen día','buen dia'],
-  gracias:['gracias','perfecto','vale','listo'],
-};
-const SPECIES = [['hurón','Hurón'],['huron','Hurón'],['perro','Perro'],['cachorro','Perro'],['gato','Gato'],['iguana','Iguana'],['gecko','Gecko'],['reptil','Reptil'],['tortuga','Tortuga'],['perico','Perico'],['loro','Loro'],['ave','Ave'],['pájaro','Ave'],['pajaro','Ave'],['conejo','Conejo'],['erizo','Erizo'],['hámster','Hámster'],['hamster','Hámster'],['serpiente','Serpiente'],['mono','Primate']];
-function detect(t,keys){ t=t.toLowerCase(); return keys.some(k=>t.includes(k)); }
-function detectSpecies(t){ t=t.toLowerCase(); for(const [k,v] of SPECIES){ if(t.includes(k)) return v; } return null; }
-function urgentAdvice(sp){
-  const map={'Hurón':'Que un hurón deje de comer amerita revisión pronto — su metabolismo es muy rápido. Manténgalo hidratado, tibio y tranquilo.','Conejo':'Un conejo que deja de comer es urgente (riesgo de estasis gastrointestinal). Ofrézcale heno y agua y no lo deje pasar de hoy.','Erizo':'Manténgalo tibio — los erizos se aletargan con el frío — y con agua disponible.','Iguana':'En reptiles la falta de apetito suele ser de temperatura o UVB. Revise su zona caliente y manténgalo hidratado.','Gecko':'Revise la temperatura del terrario y el agua; si pasa de 2-3 días sin comer, amerita revisión.','Reptil':'Revise temperatura y UVB del terrario; más de 2 días sin comer amerita revisión.','Perico':'Un ave decaída debe revisarse pronto — ocultan la enfermedad hasta etapas avanzadas. Manténgala abrigada.','Ave':'Un ave decaída debe revisarse pronto. Manténgala abrigada y sin corrientes de aire.','Perro':'Manténgalo hidratado y en observación; si hay vómito repetido o mucha debilidad, es urgente.','Gato':'Un gato que no come más de 24 horas amerita revisión pronto. Manténgalo hidratado.'};
-  return map[sp]||'Mantenga a su mascota hidratada, tibia y tranquila mientras la revisamos.';
-}
-async function botSay(text, delay){
-  return new Promise(res=>{ typing(true); setTimeout(()=>{ typing(false); addMsg(text,'bot'); res(); }, delay||900); });
-}
-async function route(text){
-  const sp = detectSpecies(text); if(sp && !S.species) S.species = sp;
-  if(S.step==='ask_pet'){ S.pet=text.replace(/^se llama /i,'').trim(); return S.species?askOwner():askSpecies(); }
-  if(S.step==='ask_species'){ S.species=sp||text.trim(); return askOwner(); }
-  if(S.step==='ask_owner'){ S.owner=text.trim(); return askPhone(); }
-  if(S.step==='ask_phone'){ S.phone=text.trim(); return askHorario(); }
-  if(S.step==='ask_horario'){ S.horario=text.trim(); return saveLead(); }
-  if(detect(text,KW.urgencia)){ S.urgente=true; S.motivo=text; S.step='ask_pet';
-    await botSay('Lamento que su compañerito no se sienta bien 🐾 Con gusto le ayudamos — atendemos domésticos y también especies exóticas.'+(S.species?' '+urgentAdvice(S.species):''));
-    await botSay('¿Cómo se llama su mascota?'); return; }
-  if(detect(text,KW.cita)){ S.motivo=text; S.step='ask_pet'; await botSay('¡Con gusto! 📅 ¿Cómo se llama su mascota?'); return; }
-  if(detect(text,KW.precio)){ ASKED_INFO='precios'; await botSay('Le comparto precios de referencia:<br>• Consulta general: $350<br>• Consulta exóticos: $450<br>• Vacunación: desde $280<br>• Estética: desde $250<br>El doctor confirma el total en la revisión 🙂');
-    await botSay('¿Le agendo una valoración?'); return; }
-  if(detect(text,KW.horario)){ ASKED_INFO='horarios'; await botSay('Nuestro horario:<br>• Lun a Vie: 9:00 AM – 7:00 PM<br>• Sábado: 9:00 AM – 2:00 PM<br>• Domingo cerrado — pero este chat le atiende 24/7 😉'); return; }
-  if(sp && detect(text,['atienden','ven ','reciben','tratan','especialista'])){ await botSay('¡Sí! En DOGTOR PETS atendemos '+sp.toLowerCase()+'s y otras especies exóticas 🐾 ¿Le agendo una revisión?'); return; }
-  if(detect(text,KW.saludo)){ await botSay('¡Buen día! Le saluda Aura, asistente de DOGTOR PETS 🐾 ¿En qué puedo apoyarle?'); return; }
-  if(detect(text,KW.gracias)){ if(ASKED_INFO) registrarCurioso(ASKED_INFO); await botSay('¡Con mucho gusto! Aquí estoy a cualquier hora si algo se le ofrece 🐾'); return; }
-  await botSay('Le leo 🙂 Puedo apoyarle con <b>urgencias</b>, <b>citas</b>, <b>precios</b> y <b>horarios</b>. ¿Qué necesita?');
-}
-async function askSpecies(){ S.step='ask_species'; await botSay('¿Qué especie es '+escapeHtml(S.pet)+'? (perro, gato, hurón, ave, reptil…)'); }
-async function askOwner(){ S.step='ask_owner'; if(S.urgente&&S.species) await botSay(urgentAdvice(S.species)); await botSay('¿A nombre de quién registro la solicitud?'); }
-async function askPhone(){ S.step='ask_phone'; await botSay('Gracias 🙌 ¿Me comparte un número de WhatsApp para que la clínica le confirme?'); }
-async function askHorario(){ S.step='ask_horario'; await botSay('Perfecto. ¿Qué día y hora le acomodan'+(S.urgente?' ? Siendo urgencia, le recomiendo lo más pronto posible':'')+'? La clínica le confirma por este medio.'); }
-async function saveLead(){
-  const lead = { owner:S.owner, pet:(S.pet||'—')+' · '+(S.species||'mascota'), species:S.species||'', phone:S.phone||'', motivo:S.motivo||'Consulta', horario:S.horario, urgente:S.urgente, ts:Date.now() };
-  LEAD_SENT = true;
-  sbInsertLead(lead).catch(()=>dpSaveUserLead(lead));
-  await botSay('¡Listo! ✅ Registré su solicitud: <b>'+escapeHtml(S.pet)+'</b> ('+escapeHtml(S.species||'mascota')+') · preferencia: '+escapeHtml(S.horario)+'. La clínica le confirma por este medio en breve 🐾');
-  toast('✅ Lead capturado — véalo en el panel');
-  S.step='start'; S.motivo=null; S.urgente=false; S.pet=null; S.species=null; S.owner=null; S.phone=null; S.horario=null;
-}
-
-// ================= Entrada =================
-async function handleUser(text){
-  if(!text.trim()) return;
-  addMsg(escapeHtml(text),'user');
-  inp.value='';
-  if(AI_MODE !== false){
-    try{
-      typing(true);
-      const raw = await askAI(text.trim());
-      typing(false);
-      addMsg(processAIReply(raw),'bot');
-      if(AI_MODE===null){ AI_MODE=true; setStatus('en línea · IA en vivo'); }
-      return;
-    }catch(e){ typing(false); AI_MODE=false; }
+  // Contadores
+  var nums = document.querySelectorAll('[data-cuenta]');
+  function anima(el){
+    var fin = parseInt(el.dataset.cuenta,10),
+        pre = el.dataset.prefijo||'', suf = el.dataset.sufijo||'',
+        t0 = null, dur = 1200;
+    function paso(t){
+      if(!t0) t0=t;
+      var p = Math.min((t-t0)/dur,1);
+      p = 1-Math.pow(1-p,3); // ease-out
+      el.textContent = pre + Math.round(fin*p) + suf;
+      if(p<1) requestAnimationFrame(paso);
+    }
+    requestAnimationFrame(paso);
   }
-  await route(text.trim());
-}
-document.getElementById('sendBtn').onclick=()=>handleUser(inp.value);
-inp.addEventListener('keydown',e=>{ if(e.key==='Enter') handleUser(inp.value); });
-
-(async ()=>{
-  await botSay('¡Buen día! Le saluda <b>Aura</b>, asistente de <b>DOGTOR PETS</b> 🐾 Con gusto le ayudo con dudas de su mascota, urgencias y citas — atendemos domésticos y especies exóticas. ¿En qué puedo apoyarle?', 700);
+  if (reduce || !('IntersectionObserver' in window)) {
+    nums.forEach(function(el){ el.textContent=(el.dataset.prefijo||'')+el.dataset.cuenta+(el.dataset.sufijo||''); });
+  } else {
+    var io2 = new IntersectionObserver(function(entries){
+      entries.forEach(function(en){
+        if (en.isIntersecting){ anima(en.target); io2.unobserve(en.target); }
+      });
+    }, {threshold:.6});
+    nums.forEach(function(el){ io2.observe(el); });
+  }
 })();
 </script>
+
 </body>
 </html>
